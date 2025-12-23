@@ -1,0 +1,190 @@
+"""
+Example script showing how to attach MP-KVM to a HuggingFace Llama model.
+This is an illustrative snippet — running it requires transformers and model weights.
+"""
+from __future__ import annotations
+import os, sys, textwrap, subprocess
+# ensure project root is on sys.path so `from core import ...` works when running script directly
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+# Helper: load Hugging Face token from environment or from a repo-local token file.
+# Priority: HUGGINGFACE_HUB_TOKEN env var -> repo root file ".hf_token" -> fallback (none).
+def _ensure_hf_token():
+    token = os.getenv("HUGGINGFACE_HUB_TOKEN", None)
+    if token:
+        return token
+    # try repo-local token file for convenience (user opted to persist token here)
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    token_paths = [os.path.join(repo_root, ".hf_token"), os.path.join(repo_root, "hf_token.txt")]
+    for p in token_paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    t = f.read().strip()
+                    if t:
+                        os.environ["HUGGINGFACE_HUB_TOKEN"] = t
+                        return t
+            except Exception:
+                pass
+    return None
+
+# call early so downstream HF calls pick up token from env
+_ensure_hf_token()
+from transformers import LlamaForCausalLM, LlamaTokenizer, LlamaConfig, AutoTokenizer, PreTrainedTokenizerFast
+from core.integration import MPKVMManager
+from adapters.llama_adapter import attach_mpkvm_to_hf_llama
+import argparse
+import yaml
+import os
+
+
+def example_attach(
+    model_name: str = "facebook/llama-3-8b",
+    head_mean: bool = True,
+    enable_injection: bool = True,
+    max_injected_centroids: int = 128,
+    device: str = "cuda:0",
+    sample_stride: int = 1,
+    use_gpu_agg: bool = True,
+    config_path: str = None,
+    local_random: bool = False,
+):
+    # optional config override from YAML
+    if config_path and os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            cfg = yaml.safe_load(f)
+        model_name = cfg.get("model", {}).get("name", model_name)
+        head_mean = bool(cfg.get("mpkvm", {}).get("head_mean", head_mean))
+        enable_injection = bool(cfg.get("mpkvm", {}).get("enable_injection", enable_injection))
+        max_injected_centroids = int(cfg.get("mpkvm", {}).get("max_injected_centroids", max_injected_centroids))
+        device = cfg.get("mpkvm", {}).get("device", device)
+        sample_stride = int(cfg.get("mpkvm", {}).get("sample_stride", sample_stride))
+        use_gpu_agg = bool(cfg.get("mpkvm", {}).get("use_gpu_aggregator", use_gpu_agg))
+
+    # allow loading a locally-downloaded model folder (e.g., repo_root/model)
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    candidate = model_name
+    # if user passed a simple folder name that exists under repo root, use that
+    if not os.path.isabs(candidate) and os.path.isdir(os.path.join(repo_root, candidate)):
+        candidate = os.path.join(repo_root, candidate)
+    # if user left default and there is a ./model folder, prefer it
+    if model_name in (None, "", "model") and os.path.isdir(os.path.join(repo_root, "model")):
+        candidate = os.path.join(repo_root, "model")
+
+    try:
+        # prefer local_files_only if candidate is a folder on disk
+        if os.path.isdir(candidate):
+            # recursively find a directory containing config.json
+            found_dir = None
+            for root, dirs, files in os.walk(candidate):
+                if "config.json" in files:
+                    found_dir = root
+                    break
+            if found_dir is not None:
+                candidate = found_dir
+            cfg_path = os.path.join(candidate, "config.json")
+            print(f"Resolved model folder: {os.path.abspath(candidate)}")
+
+            if not os.path.exists(cfg_path):
+                if local_random:
+                    # build a tiny random Llama config/model for quick testing
+                    tiny_cfg = LlamaConfig(
+                        hidden_size=64,
+                        intermediate_size=256,
+                        num_hidden_layers=2,
+                        num_attention_heads=4,
+                        vocab_size=32000,
+                    )
+                    model = LlamaForCausalLM(tiny_cfg)
+                    # fallback tokenizer for testing
+                    try:
+                        tokenizer = AutoTokenizer.from_pretrained("gpt2")
+                    except Exception:
+                        tokenizer = None
+                else:
+                    raise FileNotFoundError(f"{candidate} does not contain config.json. Add a valid HuggingFace model folder or run with --local-random to use a tiny random model for testing.")
+            else:
+                model = LlamaForCausalLM.from_pretrained(candidate, torch_dtype="auto", local_files_only=True)
+                # try fast tokenizer first (may not need sentencepiece if tokenizer.json exists)
+                try:
+                    tokenizer = AutoTokenizer.from_pretrained(candidate, use_fast=True, local_files_only=True)
+                except Exception:
+                    # try loading PreTrainedTokenizerFast directly from tokenizer.json if present
+                    try:
+                        tok_path = os.path.join(candidate, "tokenizer.json")
+                        if os.path.exists(tok_path):
+                            tokenizer = PreTrainedTokenizerFast(tokenizer_file=tok_path)
+                        else:
+                            # fallback to LlamaTokenizer (may require sentencepiece)
+                            tokenizer = LlamaTokenizer.from_pretrained(candidate, local_files_only=True)
+                    except Exception:
+                        # as a last resort, raise to surface the error to user
+                        raise
+        else:
+            model = LlamaForCausalLM.from_pretrained(candidate, torch_dtype="auto")
+            tokenizer = LlamaTokenizer.from_pretrained(candidate)
+    except Exception:
+        # fallback to normal hub download (may require token/auth)
+        model = LlamaForCausalLM.from_pretrained(model_name, torch_dtype="auto")
+        tokenizer = LlamaTokenizer.from_pretrained(model_name)
+
+    hidden_size = model.config.hidden_size
+    num_layers = model.config.num_hidden_layers
+    cpu_manager = MPKVMManager(dim=hidden_size, num_layers=num_layers, cluster_kwargs={"max_centroids": 1024, "sliding_window_size": 16384})
+
+    mgr = cpu_manager
+    if use_gpu_agg:
+        try:
+            from core.integration_gpu import MPKVMGPUAggregator
+
+            gpu_agg = MPKVMGPUAggregator(cpu_manager, dim=hidden_size, device=device, max_gpu_centroids_per_layer=512, head_mean=head_mean, sample_stride=sample_stride)
+            mgr = gpu_agg
+        except Exception:
+            mgr = cpu_manager
+
+    attach_mpkvm_to_hf_llama(model, mgr, head_mean=head_mean, sample_stride=sample_stride, enable_injection=enable_injection, max_injected_centroids=max_injected_centroids)
+
+    # now run a short generation; during forward the adapter will collect K/V into manager
+    prompt = "In 100 words, explain the significance of manifold partitioned KV memories."
+    inputs = tokenizer(prompt, return_tensors="pt")
+    _ = model.generate(**inputs, max_new_tokens=32)
+
+    # ensure GPU aggregator flushed to CPU if present
+    if hasattr(mgr, "flush_all_to_cpu"):
+        mgr.flush_all_to_cpu()
+
+    # inspect centroids from layer 0 for example (from CPU manager)
+    centroids, counts, weights = cpu_manager.get_layer_centroids(0)
+    print("Layer 0 centroids:", centroids.shape, counts.shape, weights.shape)
+
+
+def parse_and_run():
+    p = argparse.ArgumentParser()
+    p.add_argument("--config", help="YAML config path", default=None)
+    p.add_argument("--model", default="facebook/llama-3-8b")
+    p.add_argument("--head-mean", action="store_true")
+    p.add_argument("--no-injection", dest="enable_injection", action="store_false")
+    p.add_argument("--max-injected-centroids", type=int, default=128)
+    p.add_argument("--device", type=str, default="cuda:0")
+    p.add_argument("--sample-stride", type=int, default=1)
+    p.add_argument("--no-gpu-agg", dest="use_gpu_agg", action="store_false")
+    p.add_argument("--local-random", dest="local_random", action="store_true", help="Use a tiny local random model if local folder lacks config.json")
+    args = p.parse_args()
+
+    example_attach(
+        model_name=args.model,
+        head_mean=args.head_mean,
+        enable_injection=args.enable_injection,
+        max_injected_centroids=args.max_injected_centroids,
+        device=args.device,
+        sample_stride=args.sample_stride,
+        use_gpu_agg=args.use_gpu_agg,
+        config_path=args.config,
+        local_random=args.local_random,
+    )
+
+
+if __name__ == "__main__":
+    parse_and_run()
+
+
