@@ -153,9 +153,27 @@ class MPKVMManager:
                 self.layers[l] = OnlineManifoldClustering(dim=dim, **filtered)
 
     def add_kv(self, layer_idx: int, keys: np.ndarray, values: np.ndarray, weights: Optional[np.ndarray] = None):
+        # If keys provided, infer dimensionality and ensure layer cluster matches it.
+        if keys is not None and hasattr(keys, "shape") and keys.ndim == 2:
+            key_dim = int(keys.shape[1])
+        else:
+            key_dim = self.dim
+
         if layer_idx not in self.layers:
-            # lazily create if out-of-range
-            self.layers[layer_idx] = OnlineManifoldClustering(dim=self.dim, **{})
+            # lazily create cluster operator with inferred key dim
+            self.layers[layer_idx] = OnlineManifoldClustering(dim=key_dim, **{})
+        else:
+            # if existing cluster dim mismatches incoming keys, reinit that layer's cluster to match keys
+            existing = self.layers[layer_idx]
+            try:
+                existing_dim = int(existing.dim)
+            except Exception:
+                existing_dim = self.dim
+            if existing_dim != key_dim:
+                # replace with a new cluster matching the incoming key dimensionality
+                self.layers[layer_idx] = OnlineManifoldClustering(dim=key_dim, **{})
+
+        # add to the layer's cluster (weights may be None)
         self.layers[layer_idx].add(keys, values, weights)
 
     def get_layer_centroids(self, layer_idx: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:

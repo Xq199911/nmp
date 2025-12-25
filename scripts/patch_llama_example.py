@@ -36,6 +36,7 @@ from adapters.llama_adapter import attach_mpkvm_to_hf_llama
 import argparse
 import yaml
 import os
+import json
 
 
 def example_attach(
@@ -48,6 +49,8 @@ def example_attach(
     use_gpu_agg: bool = True,
     config_path: str = None,
     local_random: bool = False,
+    repeat: int = 50,
+    save_dir: str | None = None,
 ):
     # optional config override from YAML
     if config_path and os.path.exists(config_path):
@@ -137,25 +140,127 @@ def example_attach(
         try:
             from core.integration_gpu import MPKVMGPUAggregator
 
-            gpu_agg = MPKVMGPUAggregator(cpu_manager, dim=hidden_size, device=device, max_gpu_centroids_per_layer=512, head_mean=head_mean, sample_stride=sample_stride)
+            # lower max_gpu_centroids_per_layer to force more frequent flushes during PoC
+            gpu_agg = MPKVMGPUAggregator(cpu_manager, dim=hidden_size, device=device, max_gpu_centroids_per_layer=8, head_mean=head_mean, sample_stride=sample_stride)
             mgr = gpu_agg
         except Exception:
             mgr = cpu_manager
 
-    attach_mpkvm_to_hf_llama(model, mgr, head_mean=head_mean, sample_stride=sample_stride, enable_injection=enable_injection, max_injected_centroids=max_injected_centroids)
+    # enable positionless injection and pass centroid weighting so ReconstructedAttentionTorch
+    # receives counts for log-biasing. This toggles the injection code path in adapter.
+    attach_mpkvm_to_hf_llama(
+        model,
+        mgr,
+        head_mean=head_mean,
+        sample_stride=sample_stride,
+        enable_injection=enable_injection,
+        max_injected_centroids=max_injected_centroids,
+        pass_centroid_weighting=True,
+        positionless_injection=True,
+    )
 
-    # now run a short generation; during forward the adapter will collect K/V into manager
-    prompt = "In 100 words, explain the significance of manifold partitioned KV memories."
-    inputs = tokenizer(prompt, return_tensors="pt")
-    _ = model.generate(**inputs, max_new_tokens=32)
+    # now run several short generations to collect more K/V; adapter will collect during forward
+    prompts = [
+        "In 100 words, explain the significance of manifold partitioned KV memories.",
+        "Briefly summarize how centroid compression can help long-context transformers.",
+        "Explain online clustering for KV caches and why it's useful.",
+        "Discuss challenges of position encoding when merging KV tokens."
+    ]
+    import time, torch
+    generations = []
+    total = 0
+    for r in range(max(1, int(repeat))):
+        for p in prompts:
+            try:
+                inputs = tokenizer(p, return_tensors="pt")
+            except Exception:
+                # fallback: if tokenizer unavailable, create dummy input ids
+                inputs = {"input_ids": torch.tensor([[1, 2, 3, 4]], dtype=torch.long)}
+            out = model.generate(**inputs, max_new_tokens=128)
+            # decode output
+            try:
+                if hasattr(tokenizer, "decode"):
+                    gen_ids = out[0]
+                    gen_text = tokenizer.decode(gen_ids, skip_special_tokens=True)
+                else:
+                    gen_text = str(out)
+            except Exception:
+                try:
+                    gen_ids = out[0].cpu().numpy()
+                    gen_text = tokenizer.decode(gen_ids, skip_special_tokens=True)
+                except Exception:
+                    gen_text = "<decode_failed>"
+            generations.append({"prompt": p, "generation": gen_text})
+            total += 1
+        # small sleep to avoid busy-looping on some runtimes
+        time.sleep(0.01)
+    print(f"Completed {total} generation calls (repeat={repeat})")
 
     # ensure GPU aggregator flushed to CPU if present
     if hasattr(mgr, "flush_all_to_cpu"):
         mgr.flush_all_to_cpu()
 
-    # inspect centroids from layer 0 for example (from CPU manager)
-    centroids, counts, weights = cpu_manager.get_layer_centroids(0)
-    print("Layer 0 centroids:", centroids.shape, counts.shape, weights.shape)
+    # ensure GPU aggregator flushed to CPU if present
+    if hasattr(mgr, "flush_all_to_cpu"):
+        mgr.flush_all_to_cpu()
+
+    # print per-layer centroid diagnostics
+    num_layers = num_layers if 'num_layers' in locals() else model.config.num_hidden_layers
+    print("Per-layer centroid summary (centroids.shape, counts.shape, weights.shape, sum_counts):")
+    for li in range(num_layers):
+        try:
+            centroids, counts, weights = cpu_manager.get_layer_centroids(li)
+            s = float(counts.sum()) if counts.size > 0 else 0.0
+            print(f"  layer {li}: centroids={centroids.shape} counts={counts.shape} weights={weights.shape} sum_counts={s:.3f}")
+        except Exception:
+            print(f"  layer {li}: error reading centroids")
+
+    # if manager supports GPU centroids, print GPU-side summary as well
+    try:
+        get_gpu = getattr(mgr, "get_gpu_centroids", None)
+        if callable(get_gpu):
+            print("GPU-side centroid summary (per-layer):")
+            for li in range(num_layers):
+                try:
+                    gcent, gcounts = get_gpu(li)
+                    if gcent is None:
+                        print(f"  layer {li}: none")
+                    else:
+                        print(f"  layer {li}: device_centroids={tuple(gcent.shape)} device_counts={tuple(gcounts.shape)}")
+                except Exception:
+                    print(f"  layer {li}: error")
+    except Exception:
+        pass
+
+    # compute and save energy loss if possible
+    try:
+        losses = cpu_manager.energy_loss(lambda_diversity=0.0)
+        print("Energy loss per layer (lambda_diversity=0.0):")
+        for k, v in losses.items():
+            print(f"  layer {k}: {v:.6f}")
+    except Exception:
+        losses = {}
+
+    # save generations and losses if requested
+    if save_dir is not None:
+        os.makedirs(save_dir, exist_ok=True)
+        gen_path = os.path.join(save_dir, "generations.txt")
+        with open(gen_path, "w", encoding="utf-8") as f:
+            for g in generations:
+                f.write("PROMPT:\n")
+                f.write(g["prompt"] + "\n")
+                f.write("GENERATION:\n")
+                f.write(g["generation"] + "\n")
+                f.write("=" * 80 + "\n")
+        loss_path = os.path.join(save_dir, "energy_loss.json")
+        try:
+            with open(loss_path, "w", encoding="utf-8") as f:
+                json.dump({"losses": losses}, f, indent=2)
+        except Exception:
+            pass
+        print(f"Wrote generations to {gen_path} and losses to {loss_path}")
+
+    return {"generations": generations, "losses": losses}
 
 
 def parse_and_run():
@@ -169,6 +274,8 @@ def parse_and_run():
     p.add_argument("--sample-stride", type=int, default=1)
     p.add_argument("--no-gpu-agg", dest="use_gpu_agg", action="store_false")
     p.add_argument("--local-random", dest="local_random", action="store_true", help="Use a tiny local random model if local folder lacks config.json")
+    p.add_argument("--repeat", type=int, default=50, help="Number of times to repeat the prompt set in-process to collect more KV")
+    p.add_argument("--save-dir", type=str, default=None, help="Directory to save generation outputs and energy loss")
     args = p.parse_args()
 
     example_attach(
@@ -181,6 +288,8 @@ def parse_and_run():
         use_gpu_agg=args.use_gpu_agg,
         config_path=args.config,
         local_random=args.local_random,
+        repeat=args.repeat,
+        save_dir=args.save_dir,
     )
 
 
