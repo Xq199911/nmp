@@ -1,0 +1,202 @@
+{
+  "prompts": [
+    {
+      "prompt": "In 100 words, explain the significance of manifold partitioned KV memories.",
+      "similarity": 0.2879640044994376,
+      "len_on": 444,
+      "len_off": 445
+    },
+    {
+      "prompt": "Briefly summarize how centroid compression can help long-context transformers.",
+      "similarity": 0.3479188900747065,
+      "len_on": 462,
+      "len_off": 475
+    },
+    {
+      "prompt": "In 100 words, explain the significance of manifold partitioned KV memories.",
+      "similarity": 0.2860215053763441,
+      "len_on": 452,
+      "len_off": 478
+    },
+    {
+      "prompt": "Briefly summarize how centroid compression can help long-context transformers.",
+      "similarity": 0.22742474916387959,
+      "len_on": 427,
+      "len_off": 470
+    },
+    {
+      "prompt": "In 100 words, explain the significance of manifold partitioned KV memories.",
+      "similarity": 0.30679156908665106,
+      "len_on": 438,
+      "len_off": 416
+    },
+    {
+      "prompt": "Briefly summarize how centroid compression can help long-context transformers.",
+      "similarity": 0.24202420242024203,
+      "len_on": 448,
+      "len_off": 461
+    }
+  ],
+  "attention_layers": [
+    {
+      "layer": "layer_0",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_1",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_10",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_11",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_12",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_13",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_14",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_15",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_16",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_17",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_18",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_19",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_2",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_20",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_21",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_22",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_23",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_24",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_25",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_26",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_27",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_28",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_29",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_3",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_30",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_31",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_4",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_5",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_6",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_7",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_8",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    },
+    {
+      "layer": "layer_9",
+      "mean_abs_diff": null,
+      "num_compared": 0
+    }
+  ]
+}

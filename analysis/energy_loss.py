@@ -1,5 +1,6 @@
 """
-Energy / reconstruction loss utilities for MP-KVM experiments.
+Energy / reconstruction loss utilities for MP-KVM.
+Provides functions to compute reconstruction loss and assignments.
 """
 from __future__ import annotations
 import numpy as np
@@ -23,15 +24,6 @@ def compute_energy_loss(original_vectors: np.ndarray, centroid_vectors: np.ndarr
         pd = np.linalg.norm(centroid_vectors[:, None] - centroid_vectors[None, :], axis=-1)
         diversity = float(np.sum(np.triu(pd, k=1)))
     return float(sse + lambda_diversity * diversity)
-
-"""
-Energy / reconstruction loss utilities for MP-KVM.
-Provides functions to compute the L2 reconstruction loss of replacing
-original keys with centroid approximations.
-"""
-from __future__ import annotations
-import numpy as np
-from typing import Tuple
 
 
 def reconstruction_loss(keys: np.ndarray, assignments: np.ndarray, centroids: np.ndarray) -> float:
@@ -60,6 +52,6 @@ def assign_by_cosine(keys: np.ndarray, centroids: np.ndarray) -> np.ndarray:
     return np.argmax(sims, axis=1)
 
 
-__all__ = ["reconstruction_loss", "assign_by_cosine"]
+__all__ = ["compute_energy_loss", "reconstruction_loss", "assign_by_cosine"]
 
 

@@ -1,0 +1,125 @@
+{
+  "params": {
+    "out": "experiments/ablation_out",
+    "total_tokens": 10000,
+    "dim": 64,
+    "n_clusters": 20,
+    "cluster_std": 0.5,
+    "n_needles": 50,
+    "batch_size": 32,
+    "window_size": 4096,
+    "max_memory_size": 65536,
+    "recall_threshold": 0.85,
+    "seed": 0,
+    "sim_thresholds": [
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ],
+    "max_centroids_list": [
+      64,
+      128,
+      256,
+      512
+    ]
+  },
+  "results": [
+    {
+      "similarity_threshold": 0.6,
+      "max_centroids": 64,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.7,
+      "max_centroids": 64,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.8,
+      "max_centroids": 64,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.9,
+      "max_centroids": 64,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.6,
+      "max_centroids": 128,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.7,
+      "max_centroids": 128,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.8,
+      "max_centroids": 128,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.9,
+      "max_centroids": 128,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.6,
+      "max_centroids": 256,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.7,
+      "max_centroids": 256,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.8,
+      "max_centroids": 256,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.9,
+      "max_centroids": 256,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.6,
+      "max_centroids": 512,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.7,
+      "max_centroids": 512,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.8,
+      "max_centroids": 512,
+      "num_centroids": 38,
+      "recall": 0.0
+    },
+    {
+      "similarity_threshold": 0.9,
+      "max_centroids": 512,
+      "num_centroids": 38,
+      "recall": 0.0
+    }
+  ]
+}

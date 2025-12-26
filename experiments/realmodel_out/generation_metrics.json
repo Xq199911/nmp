@@ -1,0 +1,16 @@
+[
+  {
+    "prompt": "In 100 words, explain the significance of manifold partitioned KV memories.",
+    "bleu4": 0.2470361297106629,
+    "rougeL": 0.41860465116279066,
+    "len_on": 415,
+    "len_off": 387
+  },
+  {
+    "prompt": "Briefly summarize how centroid compression can help long-context transformers.",
+    "bleu4": 0.3241234978220636,
+    "rougeL": 0.42519685039370075,
+    "len_on": 447,
+    "len_off": 451
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "config": {
+      "init_preserve_first_n": null,
+      "similarity_threshold": 0.6,
+      "window_size": 200
+    },
+    "centroids": 1,
+    "recon_loss": 18774.86641464189,
+    "random_loss": 36276.328125
+  },
+  {
+    "config": {
+      "init_preserve_first_n": 2,
+      "similarity_threshold": 0.6,
+      "window_size": 200
+    },
+    "centroids": 128,
+    "recon_loss": 6995.4150390625,
+    "random_loss": 87.06595611572266
+  },
+  {
+    "config": {
+      "init_preserve_first_n": 5,
+      "similarity_threshold": 0.6,
+      "window_size": 200
+    },
+    "centroids": 128,
+    "recon_loss": 6995.4150390625,
+    "random_loss": 88.69378662109375
+  },
+  {
+    "config": {
+      "init_preserve_first_n": 10,
+      "similarity_threshold": 0.6,
+      "window_size": 200
+    },
+    "centroids": 128,
+    "recon_loss": 7002.53173828125,
+    "random_loss": 88.18644714355469
+  },
+  {
+    "config": {
+      "init_preserve_first_n": 20,
+      "similarity_threshold": 0.6,
+      "window_size": 200
+    },
+    "centroids": 128,
+    "recon_loss": 6961.1318359375,
+    "random_loss": 86.75743865966797
+  }
+]

@@ -19,6 +19,17 @@ Quickstart (PoC):
 4. To run the synthetic manifold benchmark:
    - `python experiments/run_benchmark.py --out experiments/out`
    This will generate `experiments/out/manifold.png` and print energy loss numbers.
+5. To run the synthetic "needles-in-a-haystack" quick experiment:
+   - `python -m data.needles.run_niah --total-tokens 20000 --n-needles 50 --out experiments/out`
+6. To run the lightweight LongBench/RULER simulation harness:
+   - `python experiments/run_longbench.py --mode simulate --total-tokens 20000 --out experiments/out`
+
+Running tests:
+- Install test dependencies: `pip install numpy pytest`
+- Run: `pytest -q`
+
+Continuous Integration (suggested):
+- A GitHub Actions workflow `ci.yml` is provided under `.github/workflows/` to run tests and a short simulate run on push/PR.
 
 Notes:
 - The code is intentionally framework-agnostic for easier prototyping. Concrete model adapters
@@ -28,6 +39,6 @@ Notes:
   batching, and model hooks) is left to `core/integration.py` consumers.
  - For real Llama-3-8B integration, pass the model identifier to `scripts/patch_llama_example.py --model <your-llama-3-8b-id>`.
 
-License: MIT (add your license info).
+
 
 

@@ -1,0 +1,2378 @@
+[
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.42791500000748783,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.2097333000274375,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.19191689998842776,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.20381259999703616,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.2043062000302598,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.3336179000325501,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.227032299968414,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.20067890000063926,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.1853838000097312,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.18244559998856857,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.16835369996260852,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.18075040000258014,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.17616249999264255,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.1672835000208579,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.21010199998272583,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.22394560003886,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.22092670004349202,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.20860029995674267,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.20445249998010695,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.1748278000159189,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.192792100016959,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.21028140000998974,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.21597799996379763,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.19162290001986548,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.20122300001094118,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.2151499000028707,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.21723239996936172,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.2358062999555841,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.1898522000410594,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.18305759999202564,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.20238959998823702,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.1865010000183247,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.21722330001648515,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.20804950001183897,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.20069129997864366,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.20317599998088554,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.19440839998424053,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.18792619998566806,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.18549419997725636,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.20221309998305514,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.19917559996247292,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.18626919999951497,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.18035169999348,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.18039789999602363,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.18680219998350367,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.1816126000485383,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.24358199996640906,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.19134449999546632,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.18903189996490255,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.1883155000396073,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.2018161999876611,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.1817905000061728,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.18344559997785836,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.20776449999539182,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.19245549995684996,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.17631999996956438,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.21257340000011027,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.22353620000649244,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.20651340001495555,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.20820469997124746,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.2048248000210151,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.1945541999884881,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.20018129999516532,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.1897581000230275,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.18477420002454892,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.1865131999948062,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.18138470000121742,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.17692380002699792,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.18685009999899194,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.2034591999836266,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.18229720002273098,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.17883779999101534,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.1976896999985911,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.19993860000977293,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.20293610001681373,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.20453180000185966,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.17610780004179105,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.19287669996265322,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.20221489999676123,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.19746329996269196,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 5,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.17797059996519238,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.19912440003827214,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.18570170004386455,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.1728129000402987,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.17529650003416464,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.16262970003299415,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.18015660002129152,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.17570550000527874,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.1651681999792345,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.1868310000281781,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.22232790000271052,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.17271770001389086,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.16975489998003468,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.2667801000061445,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.19709999999031425,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.1706146000069566,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.19220160000259057,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.18293080001603812,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.6,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.18181179999373853,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.18328409997047856,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.18131229997379705,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": null
+      }
+    },
+    "total_time_s": 0.16004480002447963,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.1859036999521777,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.1941097999806516,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.6
+      }
+    },
+    "total_time_s": 0.1788269000244327,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 128,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.1938287999946624,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.1770507000037469,
+    "num_centroids": 0,
+    "recall": 0.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 4000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 20,
+      "batch_size": 32,
+      "flush_interval": 512,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.8,
+        "min_merge_similarity": 0.8
+      }
+    },
+    "total_time_s": 0.16907330002868548,
+    "num_centroids": 0,
+    "recall": 0.0
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "target_k": 1,
+    "centroids_found": 1,
+    "recon_loss": 24363.772238211346,
+    "random_centroid_loss": 53169.1171875
+  },
+  {
+    "target_k": 2,
+    "centroids_found": 1,
+    "recon_loss": 24363.772238211346,
+    "random_centroid_loss": 42665.32421875
+  },
+  {
+    "target_k": 4,
+    "centroids_found": 1,
+    "recon_loss": 24363.772238211346,
+    "random_centroid_loss": 34093.0546875
+  },
+  {
+    "target_k": 8,
+    "centroids_found": 1,
+    "recon_loss": 24363.772238211346,
+    "random_centroid_loss": 21570.06640625
+  },
+  {
+    "target_k": 16,
+    "centroids_found": 1,
+    "recon_loss": 24363.772238211346,
+    "random_centroid_loss": 9961.853515625
+  },
+  {
+    "target_k": 32,
+    "centroids_found": 1,
+    "recon_loss": 24363.772238211346,
+    "random_centroid_loss": 151.521240234375
+  }
+]

@@ -8,6 +8,7 @@ This module exposes:
 from __future__ import annotations
 from typing import Any, Dict, Optional, Tuple
 import numpy as np
+import os
 from .clustering import OnlineManifoldCluster
 
 
@@ -24,6 +25,12 @@ class MPKVMManager:
         self._layers: Dict[int, OnlineManifoldCluster] = {
             i: OnlineManifoldCluster(dim=dim, **cluster_kwargs) for i in range(self.num_layers)
         }
+        # in-memory recorded attention per-layer
+        self._attn_weights = {i: [] for i in range(self.num_layers)}
+        # optional output directory for immediate attention dumps
+        self._attn_out_dir: Optional[str] = None
+        # per-layer counters for file naming
+        self._attn_counters: Dict[int, int] = {}
 
     def add_kv(self, layer_idx: int, keys: np.ndarray, values: np.ndarray, weights: Optional[np.ndarray] = None, similarity_threshold: float = 0.1):
         if layer_idx not in self._layers:
@@ -151,6 +158,8 @@ class MPKVMManager:
                 allowed = {"dim", "max_memory_size", "window_size", "max_centroids", "metric", "similarity_threshold"}
                 filtered = {k: v for k, v in cluster_kwargs.items() if k in allowed}
                 self.layers[l] = OnlineManifoldClustering(dim=dim, **filtered)
+        # container to store traced attention weights per-layer (list of numpy arrays)
+        self._attn_weights = {l: [] for l in range(self.num_layers)}
 
     def add_kv(self, layer_idx: int, keys: np.ndarray, values: np.ndarray, weights: Optional[np.ndarray] = None):
         # If keys provided, infer dimensionality and ensure layer cluster matches it.
@@ -180,6 +189,76 @@ class MPKVMManager:
         if layer_idx not in self.layers:
             return np.zeros((0, self.dim), dtype=np.float32), np.array([], dtype=int), np.array([], dtype=float)
         return self.layers[layer_idx].get_centroids()
+
+    def record_attention(self, layer_idx: int, attn_weights_np: np.ndarray) -> None:
+        """
+        Record attention weights (numpy) for the given layer.
+        attn_weights_np expected shape: (..., seq_q, seq_k) or (seq_q, seq_k)
+        """
+        # Debug entry log to help trace why recordings may be missing.
+        try:
+            print(f"[MPKVM][layer {layer_idx}] record_attention called; out_dir={getattr(self, '_attn_out_dir', None)}")
+        except Exception:
+            pass
+        if layer_idx not in self._attn_weights:
+            self._attn_weights[layer_idx] = []
+        try:
+            arr = np.asarray(attn_weights_np)
+            while arr.ndim > 2:
+                arr = arr.mean(axis=0)
+            arr = arr.astype(np.float32)
+            self._attn_weights[layer_idx].append(arr)
+            # if output dir configured, write file immediately for ON/OFF pairing
+            if getattr(self, "_attn_out_dir", None):
+                out_dir = os.path.join(self._attn_out_dir, f"layer_{layer_idx}")
+                try:
+                    os.makedirs(out_dir, exist_ok=True)
+                    cnt = self._attn_counters.get(layer_idx, 0)
+                    fname = os.path.join(out_dir, f"attn_{cnt:06d}.npy")
+                    np.save(fname, arr)
+                    self._attn_counters[layer_idx] = cnt + 1
+                except Exception:
+                    # log write failure for debugging but continue
+                    try:
+                        import traceback
+
+                        print(f"[MPKVM][layer {layer_idx}] failed writing attn file: {traceback.format_exc()}")
+                    except Exception:
+                        pass
+        except Exception:
+            # Try a more defensive conversion and record any errors for debugging.
+            try:
+                arr = np.asarray(attn_weights_np, dtype=np.float32)
+                while arr.ndim > 2:
+                    arr = arr.mean(axis=0)
+                self._attn_weights[layer_idx].append(arr)
+                # attempt to write placeholder file if out_dir set to help pairing
+                if getattr(self, "_attn_out_dir", None):
+                    out_dir = os.path.join(self._attn_out_dir, f"layer_{layer_idx}")
+                    try:
+                        os.makedirs(out_dir, exist_ok=True)
+                        cnt = self._attn_counters.get(layer_idx, 0)
+                        fname = os.path.join(out_dir, f"attn_{cnt:06d}.npy")
+                        np.save(fname, arr)
+                        self._attn_counters[layer_idx] = cnt + 1
+                    except Exception:
+                        try:
+                            import traceback
+
+                            print(f"[MPKVM][layer {layer_idx}] failed writing fallback attn file: {traceback.format_exc()}")
+                        except Exception:
+                            pass
+            except Exception:
+                try:
+                    import traceback
+
+                    print(f"[MPKVM][layer {layer_idx}] record_attention conversion failed: {traceback.format_exc()}")
+                except Exception:
+                    pass
+
+    def get_recorded_attention(self, layer_idx: int):
+        """Return list of recorded attention numpy arrays for layer or empty list."""
+        return list(self._attn_weights.get(layer_idx, []))
 
 
 def monkey_patch_attention_forward(attn_module: Any, manager: MPKVMManager, layer_idx: int):

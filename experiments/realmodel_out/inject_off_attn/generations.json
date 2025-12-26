@@ -1,0 +1,20 @@
+{
+  "generations": [
+    {
+      "prompt": "In 100 words, explain the significance of manifold partitioned KV memories.",
+      "generation": "In 100 words, explain the significance of manifold partitioned KV memories. Manifold partitioned KV memories are a type of memory that combines the benefits of both KV (key-value) memories and manifold learning. KV memories are useful for storing and retrieving data with complex relationships, while manifold learning helps to identify underlying patterns and structures in data. The significance of manifold partitioned KV memories lies in their"
+    },
+    {
+      "prompt": "Briefly summarize how centroid compression can help long-context transformers.",
+      "generation": "Briefly summarize how centroid compression can help long-context transformers. Centroid compression can help long-context transformers by reducing the memory footprint of the model, which can improve training speed and reduce the risk of out-of-memory errors. This is achieved by approximating the embedding space with a smaller set of centroids, which can be used to represent the input tokens. This approach can also help to"
+    },
+    {
+      "prompt": "Explain online clustering for KV caches and why it's useful.",
+      "generation": "Explain online clustering for KV caches and why it's useful. \nOnline clustering is a technique used to improve the performance of a Key-Value (KV) cache by clustering similar keys together. This technique is useful in scenarios where the cache is frequently accessed and updated, and the data distribution is skewed, leading to hotspots and poor cache performance.\n\nIn a traditional KV cache, keys"
+    },
+    {
+      "prompt": "Discuss challenges of position encoding when merging KV tokens.",
+      "generation": "Discuss challenges of position encoding when merging KV tokens. More...\n#include <libp2p/encoding/kv/position.hpp>\nGo to the documentation of this file.\nGo to the documentation of the ‘libp2p::encoding::kv::position’ namespace.\n◆  encode\nEncode a position into a KV token.\nThis function is used when merging KV tokens"
+    }
+  ]
+}

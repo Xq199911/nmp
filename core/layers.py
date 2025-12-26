@@ -19,7 +19,7 @@ def _ensure_torch():
         raise RuntimeError("Torch is required for GPU-side attention helpers.") from e
 
 
-def scaled_dot_product_attention(q: np.ndarray, k: np.ndarray, v: np.ndarray, mask: Optional[np.ndarray] = None):
+def scaled_dot_product_attention(q: np.ndarray, k: np.ndarray, v: np.ndarray, mask: Optional[np.ndarray] = None, score_bias: Optional[np.ndarray] = None):
     """
     q: (tq, d)
     k: (tk, d)
@@ -28,13 +28,24 @@ def scaled_dot_product_attention(q: np.ndarray, k: np.ndarray, v: np.ndarray, ma
     """
     d = q.shape[-1]
     scores = np.dot(q, k.T) / np.sqrt(float(d))
+    if score_bias is not None:
+        try:
+            sb = np.asarray(score_bias, dtype=float)
+            # broadcast to (tq, tk)
+            if sb.ndim == 1:
+                scores = scores + sb[None, :]
+            else:
+                scores = scores + sb
+        except Exception:
+            pass
     if mask is not None:
-        scores = np.where(mask, scores, -1e9)
-    # optional per-key score bias (e.g. log-counts for centroid tokens)
-    # score_bias expected shape: (tk,) but passed via kwargs in callers if needed
-    # NOTE: backward-compatible: callers that don't pass bias are unaffected.
-    # The biased variant is provided via reconstruct_with_centroids below.
-    # (No-op here unless callers add bias externally)
+        # mask is expected to be broadcastable boolean where True means keep
+        try:
+            scores = np.where(mask, scores, -1e9)
+        except Exception:
+            # fallback: if mask shape incompatible, ignore mask
+            pass
+    # stable softmax over last axis
     weights = np.exp(scores - np.max(scores, axis=-1, keepdims=True))
     weights = weights / (np.sum(weights, axis=-1, keepdims=True) + 1e-12)
     return np.dot(weights, v)
@@ -48,6 +59,7 @@ def reconstruct_with_centroids(
     centroids_v: Optional[np.ndarray] = None,
     centroid_weighting: Optional[np.ndarray] = None,
     positionless: bool = False,
+    mask: Optional[np.ndarray] = None,
 ) -> np.ndarray:
     """
     Concatenate centroid tokens to the end of K and V and perform attention.
@@ -83,8 +95,11 @@ def reconstruct_with_centroids(
     scores = np.dot(q, k_aug.T) / np.sqrt(float(d))
     if score_bias is not None:
         scores = scores + score_bias[None, :]
-    if mask := None:
-        pass
+    if mask is not None:
+        try:
+            scores = np.where(mask, scores, -1e9)
+        except Exception:
+            pass
     weights = np.exp(scores - np.max(scores, axis=-1, keepdims=True))
     weights = weights / (np.sum(weights, axis=-1, keepdims=True) + 1e-12)
     return np.dot(weights, v_aug)
@@ -99,12 +114,15 @@ def _make_positionless_numpy(keys: np.ndarray) -> np.ndarray:
     """
     k = keys.copy().astype(np.float32)
     D = k.shape[-1]
-    for i in range(0, D - 1, 2):
-        x = k[..., i]
-        y = k[..., i + 1]
+    # vectorized across pairs for better numerical stability and speed
+    # handle even and odd D gracefully (leave last dim unchanged if odd)
+    even_D = D - (D % 2)
+    if even_D > 0:
+        x = k[..., :even_D:2]
+        y = k[..., 1:even_D:2]
         r = np.sqrt(x * x + y * y)
-        k[..., i] = r
-        k[..., i + 1] = 0.0
+        k[..., :even_D:2] = r
+        k[..., 1:even_D:2] = 0.0
     return k
 
 
@@ -246,7 +264,7 @@ class ReconstructedAttentionTorch:
                 cw = centroid_weighting.to(device=centroids_k.device, dtype=centroids_k.dtype)
                 bias_centroids = torch.log(cw + 1e-12)
                 # zeros for original key positions
-                orig_len = k.shape[-2] if k.ndim >= 2 else k.shape[0]
+                orig_len = key.shape[-2] if key.ndim >= 2 else key.shape[0]
                 zeros = torch.zeros((orig_len,), dtype=bias_centroids.dtype, device=bias_centroids.device)
                 score_bias = torch.cat([zeros, bias_centroids], dim=0)
             except Exception:

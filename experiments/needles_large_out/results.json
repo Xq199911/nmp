@@ -1,0 +1,74 @@
+[
+  {
+    "cfg": {
+      "total_tokens": 20000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 50,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "max_gpu_centroids_per_layer": 512,
+      "cluster_kwargs": {
+        "init_preserve_first_n": null,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null,
+        "window_size": 50
+      }
+    },
+    "total_time_s": 1.7090273999492638,
+    "num_centroids": 45,
+    "recall": 1.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 20000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 50,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "max_gpu_centroids_per_layer": 512,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 2,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null,
+        "window_size": 50
+      }
+    },
+    "total_time_s": 1.249346999975387,
+    "num_centroids": 35,
+    "recall": 1.0
+  },
+  {
+    "cfg": {
+      "total_tokens": 20000,
+      "dim": 64,
+      "n_clusters": 20,
+      "cluster_std": 0.5,
+      "n_needles": 50,
+      "batch_size": 32,
+      "flush_interval": 256,
+      "device": "cuda:0",
+      "agg_similarity": 0.7,
+      "recall_threshold": 0.85,
+      "max_gpu_centroids_per_layer": 512,
+      "cluster_kwargs": {
+        "init_preserve_first_n": 10,
+        "similarity_threshold": 0.4,
+        "min_merge_similarity": null,
+        "window_size": 50
+      }
+    },
+    "total_time_s": 1.0517896999954246,
+    "num_centroids": 30,
+    "recall": 1.0
+  }
+]

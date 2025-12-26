@@ -27,6 +27,8 @@ class TorchOnlineManifoldCluster:
         min_count_threshold: float = 1e-3,
         device: Optional[torch.device] = None,
         dtype: Optional[torch.dtype] = None,
+        min_merge_similarity: Optional[float] = None,
+        init_preserve_first_n: Optional[int] = None,
     ):
         assert distance in ("cosine", "euclidean")
         self.dim = int(dim)
@@ -37,6 +39,8 @@ class TorchOnlineManifoldCluster:
         self.min_count_threshold = float(min_count_threshold)
         self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.dtype = dtype or torch.float32
+        self.min_merge_similarity = float(min_merge_similarity) if min_merge_similarity is not None else None
+        self.init_preserve_first_n = int(init_preserve_first_n) if init_preserve_first_n is not None else None
 
         self._sums: List[torch.Tensor] = []
         self._counts: List[float] = []
@@ -89,6 +93,15 @@ class TorchOnlineManifoldCluster:
 
         centroids, counts = self._current_centroids()
         if centroids.shape[0] == 0:
+            # optionally preserve first N items as separate centroids to avoid early collapse
+            if self.init_preserve_first_n is not None and self.init_preserve_first_n > 0:
+                to_preserve = min(self.init_preserve_first_n, n, self.max_centroids)
+                for i in range(to_preserve):
+                    self._sums.append((vectors[i] * weights[i]).detach().clone())
+                    self._counts.append(float(weights[i].item()))
+                if n > to_preserve:
+                    self.add(vectors[to_preserve:], weights=weights[to_preserve:], similarity_threshold=similarity_threshold)
+                return
             to_take = min(self.max_centroids, n)
             for i in range(to_take):
                 self._sums.append((vectors[i] * weights[i]).detach().clone())
@@ -137,8 +150,24 @@ class TorchOnlineManifoldCluster:
             dists = self._pairwise_distance(centroids, centroids)
             inf = torch.tensor(float("inf"), device=self.device, dtype=self.dtype)
             dists.fill_diagonal_(inf)
+            # find closest pair (minimum distance)
             idx = int(torch.argmin(dists).item())
             i, j = divmod(idx, dists.shape[1])
+            # If configured, compute cosine similarity and if below threshold, instead merge two smallest-weight centroids
+            if self.min_merge_similarity is not None and self.distance == "cosine":
+                # compute similarity matrix
+                cn = _normalize_rows_t(centroids)
+                sim_mat = torch.matmul(cn, cn.T)
+                sim_mat.fill_diagonal_(-float("inf"))
+                max_sim = float(torch.max(sim_mat).item())
+                if max_sim < float(self.min_merge_similarity):
+                    # merge two smallest-weight centroids
+                    counts_tensor = torch.tensor(self._counts, device=self.device, dtype=self.dtype)
+                    sorted_idx = torch.argsort(counts_tensor)
+                    if sorted_idx.numel() >= 2:
+                        i = int(sorted_idx[0].item())
+                        j = int(sorted_idx[1].item())
+
             # weighted merge: sums and counts
             self._sums[i] = (self._sums[i] + self._sums[j]).detach()
             self._counts[i] = self._counts[i] + self._counts[j]
@@ -147,10 +176,15 @@ class TorchOnlineManifoldCluster:
                 self._sums.pop(j)
                 self._counts.pop(j)
             else:
+                # remove higher index first to avoid shifting issues
                 self._sums.pop(i)
                 self._counts.pop(i)
-                self._sums.pop(j)
-                self._counts.pop(j)
+                # adjust j if necessary (j < i originally)
+                try:
+                    self._sums.pop(j)
+                    self._counts.pop(j)
+                except Exception:
+                    pass
 
     def get_centroids(self) -> Tuple[torch.Tensor, torch.Tensor]:
         """Return (centroids (C,d) torch, counts (C,) torch) on device"""

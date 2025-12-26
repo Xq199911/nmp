@@ -1,0 +1,19 @@
+{
+  "params": {
+    "total_tokens": 20000,
+    "dim": 64,
+    "n_clusters": 20,
+    "cluster_std": 0.5,
+    "n_needles": 50,
+    "window_size": 4096,
+    "max_memory_size": 65536,
+    "max_centroids": 1024,
+    "similarity_threshold": 0.8,
+    "batch_size": 32,
+    "recall_threshold": 0.85,
+    "seed": 0,
+    "out": "experiments/out"
+  },
+  "num_centroids": 38,
+  "recall": 0.0
+}

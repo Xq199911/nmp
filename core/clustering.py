@@ -208,16 +208,14 @@ class OnlineManifoldCluster:
             # Merge j into i (weighted sum)
             self._sums[i] = self._sums[i] + self._sums[j]
             self._counts[i] = self._counts[i] + self._counts[j]
-            # remove j (ensure removing higher index first to keep indices valid)
+            # remove the centroid with the larger index to avoid shifting lower indices
+            # (we merged j into i, so drop the other one)
             if j > i:
-                self._sums.pop(j)
-                self._counts.pop(j)
+                del self._sums[j]
+                del self._counts[j]
             else:
-                self._sums.pop(i)
-                self._counts.pop(i)
-                # after popping i, j's index shifts by -1, so remove original other
-                self._sums.pop(j)
-                self._counts.pop(j)
+                del self._sums[i]
+                del self._counts[i]
 
     # utility for debugging / snapshot
     def snapshot(self) -> Tuple[np.ndarray, np.ndarray]:
@@ -265,6 +263,8 @@ class OnlineManifoldClustering:
         similarity_threshold: float = 0.8,
         adaptive_threshold: bool = False,
         threshold_quantile: float = 0.9,
+        min_merge_similarity: Optional[float] = None,
+        init_preserve_first_n: Optional[int] = None,
     ):
         self.dim = dim
         self.metric = metric
@@ -272,6 +272,12 @@ class OnlineManifoldClustering:
         # adaptive thresholding (per-instance / per-layer)
         self.adaptive_threshold = bool(adaptive_threshold)
         self.threshold_quantile = float(threshold_quantile)
+        # when trimming centroids, only merge closest pairs if their similarity exceeds this value.
+        # If None, fallback to the original behavior.
+        self.min_merge_similarity = float(min_merge_similarity) if min_merge_similarity is not None else None
+        # when initializing from the first compressed batch, optionally preserve the first N items
+        # as separate centroids to avoid early global merging (helps maintain diversity).
+        self.init_preserve_first_n = int(init_preserve_first_n) if init_preserve_first_n is not None else None
         # recent similarity windows used to compute adaptive threshold quantiles
         self._recent_best_sims: List[np.ndarray] = []
 
@@ -340,12 +346,27 @@ class OnlineManifoldClustering:
 
         # greedy assign to existing centroids if sufficiently similar
         if len(self.centroids) == 0:
-            # initialize centroids directly using weighted average groups
-            centroid = self._weighted_mean(keys, w)
-            self.centroids.append(centroid)
-            self.centroid_counts.append(batch_size)
-            self.centroid_weights.append(float(w.sum()))
-            return
+            # Optionally preserve first N items as separate centroids to avoid immediate collapse
+            if self.init_preserve_first_n is not None and self.init_preserve_first_n > 0:
+                to_preserve = min(self.init_preserve_first_n, batch_size, self.max_centroids)
+                for i in range(to_preserve):
+                    self.centroids.append(keys[i].copy())
+                    self.centroid_counts.append(1)
+                    self.centroid_weights.append(float(w[i]))
+                # for any remaining items, process them normally (assign/merge)
+                start_idx = to_preserve
+                if start_idx >= batch_size:
+                    return
+                keys = keys[start_idx:]
+                w = w[start_idx:]
+                batch_size = keys.shape[0]
+            else:
+                # initialize centroids directly using weighted average groups
+                centroid = self._weighted_mean(keys, w)
+                self.centroids.append(centroid)
+                self.centroid_counts.append(batch_size)
+                self.centroid_weights.append(float(w.sum()))
+                return
 
         # compute similarities
         if self.metric == "cosine":
@@ -435,7 +456,15 @@ class OnlineManifoldClustering:
                         best_score = score
                         best_pair = (a, b)
             a, b = best_pair
-            # merge b into a
+            # If a minimum merge similarity is configured and the best pair doesn't meet it,
+            # prefer merging two smallest-weight centroids (less impact) instead of the closest pair.
+            if self.min_merge_similarity is not None and self.metric == "cosine" and best_score < float(self.min_merge_similarity):
+                # find two smallest-weight centroids
+                idx_sorted = np.argsort(self.centroid_weights)
+                a = int(idx_sorted[0])
+                b = int(idx_sorted[1]) if len(idx_sorted) > 1 else int(idx_sorted[0])
+
+            # merge b into a using weighted combination
             wa = self.centroid_weights[a]
             wb = self.centroid_weights[b]
             merged = (self.centroids[a] * wa + self.centroids[b] * wb) / (wa + wb + 1e-12)

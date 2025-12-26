@@ -1,0 +1,266 @@
+[
+  {
+    "config": {
+      "similarity_threshold": 0.6,
+      "max_centroids": 5,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 27376.17578125,
+    "ratio": 0.5073314497658911
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.6,
+      "max_centroids": 5,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 27376.17578125,
+    "ratio": 0.5073314497658911
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.6,
+      "max_centroids": 10,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 25426.388671875,
+    "ratio": 0.5462354535432046
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.6,
+      "max_centroids": 10,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 25426.388671875,
+    "ratio": 0.5462354535432046
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.6,
+      "max_centroids": 20,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28658.4453125,
+    "ratio": 0.4846318352827584
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.6,
+      "max_centroids": 20,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28658.4453125,
+    "ratio": 0.4846318352827584
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.7,
+      "max_centroids": 5,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 24690.025390625,
+    "ratio": 0.5625265559030622
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.7,
+      "max_centroids": 5,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 24690.025390625,
+    "ratio": 0.5625265559030622
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.7,
+      "max_centroids": 10,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28658.4453125,
+    "ratio": 0.4846318352827584
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.7,
+      "max_centroids": 10,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28658.4453125,
+    "ratio": 0.4846318352827584
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.7,
+      "max_centroids": 20,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28447.23828125,
+    "ratio": 0.4882299930430066
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.7,
+      "max_centroids": 20,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28447.23828125,
+    "ratio": 0.4882299930430066
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.8,
+      "max_centroids": 5,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28507.736328125,
+    "ratio": 0.4871938896967105
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.8,
+      "max_centroids": 5,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28507.736328125,
+    "ratio": 0.4871938896967105
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.8,
+      "max_centroids": 10,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28447.23828125,
+    "ratio": 0.4882299930430066
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.8,
+      "max_centroids": 10,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28447.23828125,
+    "ratio": 0.4882299930430066
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.8,
+      "max_centroids": 20,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 25719.05859375,
+    "ratio": 0.5400195694379949
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.8,
+      "max_centroids": 20,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 25719.05859375,
+    "ratio": 0.5400195694379949
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.9,
+      "max_centroids": 5,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28383.8046875,
+    "ratio": 0.48932111466592615
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.9,
+      "max_centroids": 5,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 28383.8046875,
+    "ratio": 0.48932111466592615
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.9,
+      "max_centroids": 10,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 25719.05859375,
+    "ratio": 0.5400195694379949
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.9,
+      "max_centroids": 10,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 25719.05859375,
+    "ratio": 0.5400195694379949
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.9,
+      "max_centroids": 20,
+      "persistence_decay": 1.0
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 25129.87890625,
+    "ratio": 0.5526805361840874
+  },
+  {
+    "config": {
+      "similarity_threshold": 0.9,
+      "max_centroids": 20,
+      "persistence_decay": 0.95
+    },
+    "centroids": 1,
+    "recon_loss": 13888.794948147439,
+    "random_loss": 25129.87890625,
+    "ratio": 0.5526805361840874
+  }
+]

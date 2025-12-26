@@ -1,0 +1,11 @@
+{
+  "total_tokens": 4000,
+  "dim": 64,
+  "n_clusters": 20,
+  "n_needles": 20,
+  "batch_size": 32,
+  "flush_interval": 256,
+  "total_time_s": 0.39017949998378754,
+  "num_centroids": 0,
+  "recall": 0.0
+}

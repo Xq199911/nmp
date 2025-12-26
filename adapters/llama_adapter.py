@@ -20,6 +20,7 @@ import os
 import numpy as np
 
 from core.integration import MPKVMManager
+from core.clustering import OnlineManifoldClustering
 
 
 def _to_numpy(tensor):
@@ -49,62 +50,68 @@ _DEBUG = os.getenv("MPKVM_DEBUG", "1") == "1"
 
 
 def _process_kv_and_add(manager: MPKVMManager, layer_idx: int, k_tensor, v_tensor, head_mean: bool = False, sample_stride: int = 1):
+    # normalize to numpy where possible but keep original tensors for possible GPU path
     kn = _to_numpy(k_tensor)
     vn = _to_numpy(v_tensor)
-    # expected shapes: (batch, seq, n_heads, head_dim) or (batch, seq, head_dim)
-    if kn.ndim == 4:
-        # (B, S, H, D_head)
-        if head_mean:
-            # average over heads -> (B, S, D_head)
-            kn_proc = kn.mean(axis=2)
-            vn_proc = vn.mean(axis=2)
+
+    # expected shapes: (batch, seq, n_heads, head_dim) or (batch, seq, head_dim) or already flattened (N, D)
+    def _reshape_proc(arr):
+        if arr.ndim == 4:
+            # (B, S, H, D_head)
+            if head_mean:
+                return arr.mean(axis=2).reshape((-1, arr.shape[-1]))
+            return arr.reshape((-1, arr.shape[-1]))
+        elif arr.ndim == 3:
+            # (B, S, D) or (B, S, H) after head_mean handled above
+            return arr.reshape((-1, arr.shape[-1]))
+        elif arr.ndim == 2:
+            return arr
         else:
-            # reshape to (B*S*H, D_head)
-            kn_proc = kn.reshape((-1, kn.shape[-1]))
-            vn_proc = vn.reshape((-1, vn.shape[-1]))
-    elif kn.ndim == 3:
-        kn_proc = kn.reshape((-1, kn.shape[-1]))
-        vn_proc = vn.reshape((-1, vn.shape[-1]))
-    else:
-        # fallback flatten last dim
-        kn_proc = kn.reshape((-1, kn.shape[-1]))
-        vn_proc = vn.reshape((-1, vn.shape[-1]))
+            return arr.reshape((-1, arr.shape[-1]))
+
+    kn_proc = _reshape_proc(kn)
+    vn_proc = _reshape_proc(vn)
 
     if sample_stride is not None and sample_stride > 1:
         kn_proc = kn_proc[::sample_stride]
         vn_proc = vn_proc[::sample_stride]
 
-    # ensure float32
-    kn_proc = kn_proc.astype(np.float32)
-    vn_proc = vn_proc.astype(np.float32)
+    # ensure float32 numpy for CPU path
     try:
-        # If manager supports GPU-accelerated aggregation, prefer that path
+        kn_proc = kn_proc.astype(np.float32)
+        vn_proc = vn_proc.astype(np.float32)
+    except Exception:
+        kn_proc = np.asarray(kn_proc, dtype=np.float32)
+        vn_proc = np.asarray(vn_proc, dtype=np.float32)
+
+    # prefer GPU aggregator if available and original tensors look like torch tensors
+    try:
         if hasattr(manager, "add_kv_torch"):
-            # attempt to pass original tensors if available
             try:
-                if _DEBUG:
-                    try:
-                        kshape = getattr(k_tensor, "shape", None)
-                        vshape = getattr(v_tensor, "shape", None)
-                    except Exception:
-                        kshape = None
-                        vshape = None
-                    print(f"[MPKVM][layer {layer_idx}] add_kv_torch called with shapes k={kshape} v={vshape}")
+                # pass through original tensors first to avoid CPU<->GPU copies
                 manager.add_kv_torch(layer_idx, k_tensor, v_tensor)
+                if _DEBUG:
+                    print(f"[MPKVM][layer {layer_idx}] add_kv_torch succeeded")
+                return
             except Exception:
                 if _DEBUG:
-                    print(f"[MPKVM][layer {layer_idx}] add_kv_torch failed, falling back to add_kv (CPU path)")
-                manager.add_kv(layer_idx, kn_proc, vn_proc)
-        else:
-            if _DEBUG:
+                    print(f"[MPKVM][layer {layer_idx}] add_kv_torch failed, falling back to CPU path")
+                # fallthrough to CPU path
+
+        # CPU path
+        if _DEBUG:
+            try:
                 print(f"[MPKVM][layer {layer_idx}] add_kv (CPU) called with shapes k_proc={kn_proc.shape} v_proc={vn_proc.shape}")
-            manager.add_kv(layer_idx, kn_proc, vn_proc)
+            except Exception:
+                pass
+        manager.add_kv(layer_idx, kn_proc, vn_proc)
     except Exception:
-        # be defensive: do not raise from adapter
         if _DEBUG:
             import traceback
+
             print(f"[MPKVM][layer {layer_idx}] Exception in _process_kv_and_add:\n" + traceback.format_exc())
-        pass
+        # never raise from adapter
+        return
 
 
 def attach_mpkvm_to_hf_llama(
@@ -117,6 +124,7 @@ def attach_mpkvm_to_hf_llama(
     per_layer_injection: Optional[Iterable[int]] = None,
     pass_centroid_weighting: bool = True,
     positionless_injection: bool = False,
+    cluster_kwargs: Optional[dict] = None,
 ):
     """
     Walk the model and attach wrappers to attention modules.
@@ -189,71 +197,100 @@ def attach_mpkvm_to_hf_llama(
             except Exception:
                 pass
 
-        # wrap forward
+        # wrap forward with more robust KV extraction heuristics
         orig_forward = getattr(attn_module, "forward")
 
         def make_wrapped(orig_forward, attn_module, layer_idx, enable_injection=enable_injection, max_injected_centroids=max_injected_centroids, per_layer_set=per_layer_set, pass_centroid_weighting=pass_centroid_weighting, positionless_injection=positionless_injection):
             def wrapped(*args, **kwargs):
                 outputs = orig_forward(*args, **kwargs)
-                # attempt to extract K/V from module attributes first
-                k = getattr(attn_module, "last_key", None)
-                v = getattr(attn_module, "last_value", None)
-                # if not present, try to pull from outputs (present_key_value_states)
+
+                # 1) Try module attributes (common names)
+                candidates = ["last_key", "last_value", "key", "value", "present_key", "present_value", "present_key_value_states", "present"]
+                k = None
+                v = None
+                for name in candidates:
+                    try:
+                        attr = getattr(attn_module, name, None)
+                        if attr is not None:
+                            # some attrs may be tuples/lists (k,v)
+                            if isinstance(attr, (list, tuple)) and len(attr) >= 2:
+                                k, v = attr[0], attr[1]
+                                break
+                            # else try to infer by name
+                            if "key" in name and k is None:
+                                k = attr
+                            if "value" in name and v is None:
+                                v = attr
+                            if k is not None and v is not None:
+                                break
+                    except Exception:
+                        continue
+
+                # 2) Try outputs (many HF models return present_key_value_states or tuple)
                 if (k is None or v is None) and isinstance(outputs, tuple) and len(outputs) > 1:
                     pv = outputs[1]
                     try:
+                        # present might be (k, v) or list of layers; handle several shapes
                         if isinstance(pv, (list, tuple)) and len(pv) >= 2:
-                            k, v = pv[0], pv[1]
+                            # pv could be ((k_layer,...),(v_layer,...)) or (k,v)
+                            first = pv[0]
+                            second = pv[1]
+                            # if first/second are tensors or arrays, assign
+                            k = k or first
+                            v = v or second
+                        elif hasattr(pv, "present_key_values") or hasattr(pv, "past_key_values"):
+                            # model-specific container; attempt attribute access
+                            try:
+                                p = getattr(pv, "present_key_values", None) or getattr(pv, "past_key_values", None)
+                                if isinstance(p, (list, tuple)) and len(p) >= 2:
+                                    k = k or p[0]
+                                    v = v or p[1]
+                            except Exception:
+                                pass
                     except Exception:
-                        k = None
-                        v = None
-                # If k/v not found, attempt conservative probe: compute k/v from available projections
+                        pass
+
+                # 3) Try kwargs like past_key_values
+                if (k is None or v is None) and "past_key_values" in kwargs:
+                    p = kwargs.get("past_key_values", None)
+                    try:
+                        if isinstance(p, (list, tuple)) and len(p) >= 2:
+                            k = k or p[0]
+                            v = v or p[1]
+                    except Exception:
+                        pass
+
+                # 4) Conservative probe: use projection layers if exposed
                 if (k is None or v is None):
-                    probed = False
-                    # try to get a query/hidden_states from args or kwargs
                     query = None
                     if len(args) > 0:
                         query = args[0]
                     elif "hidden_states" in kwargs:
                         query = kwargs["hidden_states"]
-                    # if attn_module exposes proj layers, try to project
                     try:
-                        if query is not None and hasattr(attn_module, "k_proj") and hasattr(attn_module, "v_proj"):
-                            try:
-                                kp = getattr(attn_module, "k_proj")
-                                vp = getattr(attn_module, "v_proj")
-                                # compute k,v via projections (best-effort)
-                                k_try = kp(query)
-                                v_try = vp(query)
-                                if k_try is not None and v_try is not None:
-                                    k = k_try
-                                    v = v_try
-                                    probed = True
-                                    if _DEBUG:
-                                        try:
-                                            print(f"[MPKVM][layer {layer_idx}] probe used k_proj/v_proj on query, shapes k={getattr(k,'shape',None)} v={getattr(v,'shape',None)}")
-                                        except Exception:
-                                            pass
-                            except Exception:
-                                # fallthrough
-                                pass
-                        # fallback: try applying q_proj/k_proj/v_proj where available
-                        if not probed and query is not None and hasattr(attn_module, "q_proj") and hasattr(attn_module, "k_proj") and hasattr(attn_module, "v_proj"):
-                            try:
-                                q_try = attn_module.q_proj(query)
-                                k_try = attn_module.k_proj(query)
-                                v_try = attn_module.v_proj(query)
-                                if k_try is not None and v_try is not None:
-                                    k = k_try
-                                    v = v_try
-                                    probed = True
-                                    if _DEBUG:
-                                        print(f"[MPKVM][layer {layer_idx}] probe used q_proj/k_proj/v_proj on query")
-                            except Exception:
-                                pass
+                        if query is not None:
+                            if hasattr(attn_module, "k_proj") and hasattr(attn_module, "v_proj"):
+                                try:
+                                    k_try = getattr(attn_module, "k_proj")(query)
+                                    v_try = getattr(attn_module, "v_proj")(query)
+                                    if k_try is not None and v_try is not None:
+                                        k = k or k_try
+                                        v = v or v_try
+                                except Exception:
+                                    pass
+                            if (k is None or v is None) and hasattr(attn_module, "q_proj") and hasattr(attn_module, "k_proj") and hasattr(attn_module, "v_proj"):
+                                try:
+                                    q_try = attn_module.q_proj(query)
+                                    k_try = attn_module.k_proj(query)
+                                    v_try = attn_module.v_proj(query)
+                                    k = k or k_try
+                                    v = v or v_try
+                                except Exception:
+                                    pass
                     except Exception:
                         if _DEBUG:
                             import traceback
+
                             print(f"[MPKVM][layer {layer_idx}] probe failed:\n" + traceback.format_exc())
 
                 # send KV to manager (prefer GPU path if available)
@@ -268,13 +305,304 @@ def attach_mpkvm_to_hf_llama(
                         print(f"[MPKVM][layer {layer_idx}] extracted k type={type(k).__name__ if k is not None else None} shape={kshape}  v type={type(v).__name__ if v is not None else None} shape={vshape}")
                     try:
                         _process_kv_and_add(manager, layer_idx, k, v, head_mean=head_mean, sample_stride=sample_stride)
+                        # attempt to record attention weights if q and k are available as torch tensors
+                        try:
+                            import torch
+                            q_tensor = None
+                            # prefer explicit query variable if present
+                            if 'query' in locals() and isinstance(query, torch.Tensor):
+                                q_tensor = query
+                            # fallback to last_query attr
+                            if q_tensor is None:
+                                q_tensor = getattr(attn_module, "last_query", None)
+                            # if still None, try to extract from args/kwargs (hidden_states)
+                            if q_tensor is None:
+                                try:
+                                    if len(args) > 0 and isinstance(args[0], torch.Tensor):
+                                        q_tensor = args[0]
+                                    elif "hidden_states" in kwargs and isinstance(kwargs["hidden_states"], torch.Tensor):
+                                        q_tensor = kwargs["hidden_states"]
+                                except Exception:
+                                    q_tensor = None
+                            # if q_proj exists, try projecting a query to get proper shape
+                            if q_tensor is not None and not hasattr(q_tensor, "shape") and hasattr(attn_module, "q_proj"):
+                                try:
+                                    q_tensor = attn_module.q_proj(q_tensor)
+                                except Exception:
+                                    pass
+                            # ensure q and k are torch tensors and compute attention weights
+                            if q_tensor is not None and isinstance(q_tensor, torch.Tensor) and isinstance(k, torch.Tensor):
+                                try:
+                                    # Normalize q/k shapes to (N, S, D) where N can be B*H if needed.
+                                    def _flatten_for_attn(t):
+                                        # (B, H, S, D) -> (B*H, S, D)
+                                        if t.ndim == 4:
+                                            return t.reshape(-1, t.shape[-2], t.shape[-1])
+                                        # (B, S, D) -> (B, S, D)
+                                        if t.ndim == 3:
+                                            return t
+                                        # (S, D) or (N, D) -> make batch dim
+                                        if t.ndim == 2:
+                                            return t.unsqueeze(0)
+                                        # fallback: try to reshape to (..., S, D)
+                                        try:
+                                            return t.reshape(-1, t.shape[-2], t.shape[-1])
+                                        except Exception:
+                                            return None
+
+                                    qf = _flatten_for_attn(q_tensor)
+                                    kf = _flatten_for_attn(k)
+
+                                    if qf is None or kf is None:
+                                        raise RuntimeError("could not normalize q/k tensors for attention recording")
+
+                                    # If last-dim mismatch, try to split q into heads using module attributes
+                                    if qf.shape[-1] != kf.shape[-1]:
+                                        # prefer num_key_value_heads or num_key_value_groups if available
+                                        n_kv_heads = getattr(attn_module, "num_key_value_heads", None) or getattr(attn_module, "num_key_value_groups", None)
+                                        handled = False
+                                        if n_kv_heads is not None and int(n_kv_heads) > 0 and qf.shape[-1] == kf.shape[-1] * int(n_kv_heads):
+                                            H = int(n_kv_heads)
+                                            handled = True
+                                        else:
+                                            # fallback: if q dim is an integer multiple of k dim, infer number of q-heads
+                                            if kf.shape[-1] > 0 and (qf.shape[-1] % kf.shape[-1]) == 0:
+                                                H = int(qf.shape[-1] // kf.shape[-1])
+                                                handled = True
+
+                                        if handled:
+                                            # split qf's last dim into heads
+                                            Bn, Sq, Dq = qf.shape
+                                            Dh = int(kf.shape[-1])
+                                            # reshape (Bn, Sq, H*Dh) -> (Bn, H, Sq, Dh) -> (Bn*H, Sq, Dh)
+                                            qf = qf.reshape(Bn, Sq, H, Dh).permute(0, 2, 1, 3).reshape(-1, Sq, Dh)
+                                        else:
+                                            # incompatible shapes; skip recording to avoid expensive errors
+                                            raise RuntimeError(f"incompatible q/k head dims q={qf.shape} k={kf.shape}")
+
+                                    # Now compute attention scores and weights
+                                    dq = float(qf.shape[-1])
+                                    scores = torch.matmul(qf, kf.transpose(-2, -1)) / (dq ** 0.5)
+                                    weights = torch.softmax(scores, dim=-1)
+                                    # record as numpy
+                                    try:
+                                        manager.record_attention(layer_idx, weights.detach().cpu().numpy())
+                                        if _DEBUG:
+                                            print(f"[MPKVM][layer {layer_idx}] recorded attention weights shape={getattr(weights,'shape',None)}")
+                                    except Exception:
+                                        # best-effort: convert then record
+                                        try:
+                                            manager.record_attention(layer_idx, weights.detach().cpu().numpy())
+                                        except Exception:
+                                            if _DEBUG:
+                                                print(f"[MPKVM][layer {layer_idx}] failed to record attention weights")
+                                except Exception:
+                                    if _DEBUG:
+                                        import traceback
+                                        print(f"[MPKVM][layer {layer_idx}] failed computing attention weights: {traceback.format_exc()}")
+                        except Exception:
+                            # ignore any failures in recording to avoid breaking forward
+                            pass
                         if _DEBUG:
                             print(f"[MPKVM][layer {layer_idx}] _process_kv_and_add succeeded")
                     except Exception:
                         if _DEBUG:
                             import traceback
+
                             print(f"[MPKVM][layer {layer_idx}] _process_kv_and_add raised:\n" + traceback.format_exc())
                         pass
+
+                # Forced-projection fallback: if attention weights were not recorded above,
+                # try to compute q and k via projection layers (q_proj/k_proj) from hidden_states
+                # and record the resulting attention. This helps when module attributes like
+                # last_query/last_key are not populated.
+                try:
+                    if _DEBUG:
+                        print(f"[MPKVM][layer {layer_idx}] attempting forced projection fallback for attention recording")
+                    import torch
+                    # obtain a candidate query source
+                    query_src = None
+                    if len(args) > 0:
+                        query_src = args[0]
+                    elif "hidden_states" in kwargs:
+                        query_src = kwargs["hidden_states"]
+
+                    q_proj = getattr(attn_module, "q_proj", None)
+                    k_proj = getattr(attn_module, "k_proj", None)
+
+                    qf = None
+                    kf = None
+                    if query_src is not None:
+                        try:
+                            if callable(q_proj):
+                                q_try = q_proj(query_src)
+                                if isinstance(q_try, torch.Tensor):
+                                    qf = q_try
+                            if callable(k_proj):
+                                k_try = k_proj(query_src)
+                                if isinstance(k_try, torch.Tensor):
+                                    kf = k_try
+                        except Exception:
+                            qf = None
+                            kf = None
+
+                    # fallback to existing tensors if projection didn't yield tensors
+                    if kf is None and isinstance(k, torch.Tensor):
+                        kf = k
+                    if qf is None:
+                        qf = getattr(attn_module, "last_query", None)
+
+                    if isinstance(qf, torch.Tensor) and isinstance(kf, torch.Tensor):
+                        def _flatten_for_attn(t):
+                            if t.ndim == 4:
+                                return t.reshape(-1, t.shape[-2], t.shape[-1])
+                            if t.ndim == 3:
+                                return t
+                            if t.ndim == 2:
+                                return t.unsqueeze(0)
+                            try:
+                                return t.reshape(-1, t.shape[-2], t.shape[-1])
+                            except Exception:
+                                return None
+
+                        qff = _flatten_for_attn(qf)
+                        kff = _flatten_for_attn(kf)
+                        if qff is not None and kff is not None:
+                            # handle possible head-dim mismatch
+                            if qff.shape[-1] != kff.shape[-1]:
+                                n_kv_heads = getattr(attn_module, "num_key_value_heads", None) or getattr(attn_module, "num_key_value_groups", None)
+                                handled = False
+                                if n_kv_heads is not None and int(n_kv_heads) > 0 and qff.shape[-1] == kff.shape[-1] * int(n_kv_heads):
+                                    H = int(n_kv_heads)
+                                    handled = True
+                                else:
+                                    if kff.shape[-1] > 0 and (qff.shape[-1] % kff.shape[-1]) == 0:
+                                        H = int(qff.shape[-1] // kff.shape[-1])
+                                        handled = True
+                                if handled:
+                                    Bn, Sq, Dq = qff.shape
+                                    Dh = int(kff.shape[-1])
+                                    qff = qff.reshape(Bn, Sq, H, Dh).permute(0, 2, 1, 3).reshape(-1, Sq, Dh)
+                                else:
+                                    qff = None
+                            if qff is not None:
+                                dq = float(qff.shape[-1])
+                                scores = torch.matmul(qff, kff.transpose(-2, -1)) / (dq ** 0.5)
+                                weights = torch.softmax(scores, dim=-1)
+                                try:
+                                    manager.record_attention(layer_idx, weights.detach().cpu().numpy())
+                                    if _DEBUG:
+                                        print(f"[MPKVM][layer {layer_idx}] forced-proj recorded attention shape={getattr(weights,'shape',None)}")
+                                except Exception:
+                                    if _DEBUG:
+                                        print(f"[MPKVM][layer {layer_idx}] forced-proj failed to save attention")
+                except Exception:
+                    if _DEBUG:
+                        try:
+                            import traceback
+
+                            print(f"[MPKVM][layer {layer_idx}] forced projection fallback failed: {traceback.format_exc()}")
+                        except Exception:
+                            pass
+
+                # Forced projection fallback: if previous recording attempts failed, try to
+                # compute q/k via q_proj/k_proj from hidden_states (safe, guarded) and record.
+                try:
+                    if _DEBUG:
+                        print(f"[MPKVM][layer {layer_idx}] attempting forced projection fallback for attention recording")
+                    import torch
+
+                    # attempt to locate a query source
+                    query_src = None
+                    if len(args) > 0:
+                        query_src = args[0]
+                    elif "hidden_states" in kwargs:
+                        query_src = kwargs["hidden_states"]
+
+                    qf = None
+                    kf = None
+                    # If projection modules exist, try to apply them to query_src
+                    q_proj = getattr(attn_module, "q_proj", None)
+                    k_proj = getattr(attn_module, "k_proj", None)
+                    if query_src is not None:
+                        try:
+                            if callable(q_proj):
+                                q_try = q_proj(query_src)
+                                if isinstance(q_try, torch.Tensor):
+                                    qf = q_try
+                            if callable(k_proj):
+                                k_try = k_proj(query_src)
+                                if isinstance(k_try, torch.Tensor):
+                                    kf = k_try
+                        except Exception:
+                            qf = None
+                            kf = None
+
+                    # fallback to available tensors
+                    if kf is None and isinstance(k, torch.Tensor):
+                        kf = k
+                    # q_tensor may have been set above; try to reuse
+                    q_tensor_local = None
+                    try:
+                        q_tensor_local = locals().get("q_tensor", None)
+                    except Exception:
+                        q_tensor_local = None
+                    if qf is None and isinstance(q_tensor_local, torch.Tensor):
+                        qf = q_tensor_local
+
+                    # compute attention if we have tensors
+                    if isinstance(qf, torch.Tensor) and isinstance(kf, torch.Tensor):
+                        def _flatten_for_attn(t):
+                            if t.ndim == 4:
+                                return t.reshape(-1, t.shape[-2], t.shape[-1])
+                            if t.ndim == 3:
+                                return t
+                            if t.ndim == 2:
+                                return t.unsqueeze(0)
+                            try:
+                                return t.reshape(-1, t.shape[-2], t.shape[-1])
+                            except Exception:
+                                return None
+
+                        qff = _flatten_for_attn(qf)
+                        kff = _flatten_for_attn(kf)
+                        if qff is not None and kff is not None:
+                            # handle head mismatch heuristics (same as above)
+                            if qff.shape[-1] != kff.shape[-1]:
+                                n_kv_heads = getattr(attn_module, "num_key_value_heads", None) or getattr(attn_module, "num_key_value_groups", None)
+                                handled = False
+                                if n_kv_heads is not None and int(n_kv_heads) > 0 and qff.shape[-1] == kff.shape[-1] * int(n_kv_heads):
+                                    H = int(n_kv_heads)
+                                    handled = True
+                                else:
+                                    if kff.shape[-1] > 0 and (qff.shape[-1] % kff.shape[-1]) == 0:
+                                        H = int(qff.shape[-1] // kff.shape[-1])
+                                        handled = True
+                                if handled:
+                                    Bn, Sq, Dq = qff.shape
+                                    Dh = int(kff.shape[-1])
+                                    qff = qff.reshape(Bn, Sq, H, Dh).permute(0, 2, 1, 3).reshape(-1, Sq, Dh)
+                                else:
+                                    qff = None
+                            if qff is not None:
+                                dq = float(qff.shape[-1])
+                                scores = torch.matmul(qff, kff.transpose(-2, -1)) / (dq ** 0.5)
+                                weights = torch.softmax(scores, dim=-1)
+                                try:
+                                    manager.record_attention(layer_idx, weights.detach().cpu().numpy())
+                                    if _DEBUG:
+                                        print(f"[MPKVM][layer {layer_idx}] forced-proj recorded attention shape={getattr(weights,'shape',None)}")
+                                except Exception:
+                                    if _DEBUG:
+                                        print(f"[MPKVM][layer {layer_idx}] forced-proj failed to save attention")
+                except Exception:
+                    if _DEBUG:
+                        try:
+                            import traceback
+
+                            print(f"[MPKVM][layer {layer_idx}] forced projection fallback failed: {traceback.format_exc()}")
+                        except Exception:
+                            pass
 
                 # Attempt GPU-side centroid injection if enabled and allowed for this layer
                 try:
@@ -341,7 +669,38 @@ def attach_mpkvm_to_hf_llama(
                     pass
 
                 return outputs
+
             return wrapped
+
+        # If cluster_kwargs provided and manager has per-layer storage, attempt to (re)initialize the layer's cluster operator.
+        try:
+            if cluster_kwargs is not None and hasattr(manager, "layers"):
+                try:
+                    existing = None
+                    try:
+                        existing = manager.layers.get(idx, None)
+                    except Exception:
+                        existing = None
+                    dim = None
+                    if existing is not None:
+                        try:
+                            dim = int(existing.dim)
+                        except Exception:
+                            dim = None
+                    if dim is None:
+                        # try to infer from model config
+                        dim = getattr(model.config, "hidden_size", None) or getattr(model.config, "d_model", None) or getattr(model.config, "n_embd", None)
+                    if dim is None:
+                        dim = 1024
+                    try:
+                        manager.layers[idx] = OnlineManifoldClustering(dim=int(dim), **cluster_kwargs)
+                    except Exception:
+                        # best-effort: ignore failures
+                        pass
+                except Exception:
+                    pass
+        except Exception:
+            pass
 
         setattr(attn_module, "forward", make_wrapped(orig_forward, attn_module, idx))
 

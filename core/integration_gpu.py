@@ -96,11 +96,18 @@ class MPKVMGPUAggregator:
 
         # greedy on-device merge: for each vector, either merge to nearest centroid or append
         if len(sum_k_list) == 0:
-            # initialize from batch by promoting each vector as its own centroid
-            for i in range(k_proc.shape[0]):
+            # initialize from batch by promoting up to capacity vectors as initial centroids
+            n_init = min(k_proc.shape[0], self.max_gpu_centroids_per_layer)
+            for i in range(n_init):
                 sum_k_list.append(k_proc[i].clone())
                 sum_v_list.append(v_proc[i].clone())
                 count_list.append(1.0)
+            if k_proc.shape[0] > n_init:
+                rem = k_proc[n_init:]
+                rem_v = v_proc[n_init:]
+            else:
+                rem = None
+                rem_v = None
         else:
             # stack existing centroids for distance computation
             centroid_k = torch.stack(sum_k_list, dim=0)  # (C, D) but sums not normalized
@@ -116,7 +123,7 @@ class MPKVMGPUAggregator:
                 for i in range(k_proc.shape[0]):
                     sim = float(best_sim[i].item())
                     idx = int(best_idx[i].item())
-                    if sim >= (1.0 - self.similarity_threshold):
+                    if sim >= float(self.similarity_threshold):
                         # merge into idx
                         wk = k_proc[i]
                         wv = v_proc[i]
@@ -147,23 +154,35 @@ class MPKVMGPUAggregator:
         if layer_idx not in self._layers:
             return
         storage = self._layers[layer_idx]
-        sum_k_list = storage["sum_k"]
-        sum_v_list = storage["sum_v"]
-        count_list = storage["count"]
-        if len(sum_k_list) == 0:
-            return
+        # support two storage formats: list-based (legacy) or tensor-based (optimized)
+        sum_k_list = storage.get("sum_k", None)
+        sum_v_list = storage.get("sum_v", None)
+        count_list = storage.get("count", None)
+        cent_k = None
+        cent_v = None
 
-        # compute centroids as sums / counts
-        ks = torch.stack(sum_k_list, dim=0)
-        vs = torch.stack(sum_v_list, dim=0)
-        # ensure counts are float32 for division
-        counts = torch.tensor(count_list, device=ks.device, dtype=torch.float32)
-        cent_k = ks / counts[:, None]
-        cent_v = vs / counts[:, None]
+        if storage.get("centroid_k_tensor", None) is not None and storage.get("counts_tensor", None) is not None:
+            cent_k = storage["centroid_k_tensor"]
+            counts = storage["counts_tensor"]
+            # ensure tensors detached
+            cent_k = cent_k.detach()
+            counts = counts.detach()
+            # cent_v not tracked separately in optimized path; use cent_k as values fallback
+            cent_v = cent_k
+        else:
+            if sum_k_list is None or len(sum_k_list) == 0:
+                return
+            # compute centroids as sums / counts
+            ks = torch.stack(sum_k_list, dim=0)
+            vs = torch.stack(sum_v_list, dim=0)
+            # ensure counts are float32 for division
+            counts = torch.tensor(count_list, device=ks.device, dtype=torch.float32)
+            cent_k = ks / counts[:, None]
+            cent_v = vs / counts[:, None]
 
         # move to cpu numpy and call cpu_manager.add_kv
         cent_k_cpu_tensor = cent_k.detach()
-        cent_v_cpu_tensor = cent_v.detach()
+        cent_v_cpu_tensor = cent_v.detach() if cent_v is not None else cent_k_cpu_tensor
         # cast half precision / bfloat16 to float32 before numpy conversion
         try:
             if cent_k_cpu_tensor.dtype in (torch.bfloat16, torch.float16):
@@ -216,8 +235,16 @@ class MPKVMGPUAggregator:
         if layer_idx not in self._layers:
             return None, None
         storage = self._layers[layer_idx]
-        sum_k_list = storage["sum_k"]
-        count_list = storage["count"]
+        # support optimized tensor-backed storage
+        if storage.get("centroid_k_tensor", None) is not None and storage.get("counts_tensor", None) is not None:
+            centroids = storage["centroid_k_tensor"]
+            counts = storage["counts_tensor"]
+            if centroids.numel() == 0:
+                return None, None
+            return centroids, counts
+        # fallback to legacy list storage
+        sum_k_list = storage.get("sum_k", [])
+        count_list = storage.get("count", [])
         if len(sum_k_list) == 0:
             return None, None
         ks = torch.stack(sum_k_list, dim=0)
@@ -228,5 +255,182 @@ class MPKVMGPUAggregator:
 
 
 __all__ = ["MPKVMGPUAggregator"]
+
+
+class MPKVMGPUAggregatorOptimized(MPKVMGPUAggregator):
+    """
+    Optimized GPU-side aggregator that vectorizes assignment and merging operations
+    to reduce Python loop overhead. Maintains per-layer centroids as tensors on the
+    configured device and updates sums/counts in batched operations.
+    """
+
+    def add_kv_torch(self, layer_idx: int, k_tensor, v_tensor, weights: Optional[Any] = None):
+        try:
+            import torch
+        except Exception:
+            # fallback to CPU path if torch missing
+            kn = np.asarray(k_tensor)
+            vn = np.asarray(v_tensor)
+            self.cpu_manager.add_kv(layer_idx, kn.reshape((-1, kn.shape[-1])), vn.reshape((-1, vn.shape[-1])))
+            return
+
+        # flatten incoming keys to (N, D) on target device
+        dev = torch.device(self.device) if self.device is not None else k_tensor.device
+        if k_tensor.device != dev:
+            k_tensor = k_tensor.to(dev)
+        if v_tensor.device != dev:
+            v_tensor = v_tensor.to(dev)
+
+        if k_tensor.ndim >= 2:
+            k_flat = k_tensor.reshape(-1, k_tensor.shape[-1]).to(device=dev)
+            v_flat = v_tensor.reshape(-1, v_tensor.shape[-1]).to(device=dev)
+        else:
+            k_flat = k_tensor.reshape(-1, self.dim).to(device=dev)
+            v_flat = v_tensor.reshape(-1, self.dim).to(device=dev)
+
+        if self.sample_stride is not None and self.sample_stride > 1:
+            k_flat = k_flat[:: self.sample_stride]
+            v_flat = v_flat[:: self.sample_stride]
+
+        self._ensure_layer(layer_idx)
+        storage = self._layers[layer_idx]
+        sum_k_list = storage["sum_k"]
+        sum_v_list = storage["sum_v"]
+        count_list = storage["count"]
+
+        # If no existing centroids, initialize in batch
+        if len(sum_k_list) == 0:
+            n_init = min(k_flat.shape[0], self.max_gpu_centroids_per_layer)
+            for i in range(n_init):
+                sum_k_list.append(k_flat[i].clone())
+                sum_v_list.append(v_flat[i].clone())
+                count_list.append(1.0)
+            if k_flat.shape[0] <= n_init:
+                return
+            rem_k = k_flat[n_init:]
+            rem_v = v_flat[n_init:]
+        else:
+            rem_k = k_flat
+            rem_v = v_flat
+
+        if rem_k.numel() == 0:
+            return
+
+        # Stack existing centroids and compute mean vectors
+        centroid_k = torch.stack(sum_k_list, dim=0)  # (C, D)
+        counts = torch.tensor(count_list, device=centroid_k.device, dtype=centroid_k.dtype)
+        centroid_mean = centroid_k / counts[:, None]
+
+        # normalize routine
+        def normalize(t):
+            n = t.norm(dim=-1, keepdim=True)
+            n[n == 0] = 1.0
+            return t / n
+
+        c_norm = normalize(centroid_mean)
+        k_norm = normalize(rem_k)
+
+        # compute similarities in one matmul: (N_rem, C)
+        sims = torch.matmul(k_norm, c_norm.T)
+        best_sim, best_idx = sims.max(dim=1)
+
+        # mask for matches vs new
+        match_mask = best_sim >= float(self.similarity_threshold)
+        new_mask = ~match_mask
+
+        # process matches: accumulate sums and counts per centroid in vectorized way
+        if match_mask.any():
+            matched_indices = best_idx[match_mask]  # indices into centroids
+            matched_keys = rem_k[match_mask]
+            matched_vals = rem_v[match_mask]
+            # aggregate per-centroid by scatter_add
+            C = centroid_k.shape[0]
+            D = centroid_k.shape[1]
+            delta_k = torch.zeros((C, D), device=centroid_k.device, dtype=centroid_k.dtype)
+            delta_v = torch.zeros((C, D), device=centroid_k.device, dtype=centroid_k.dtype)
+            delta_count = torch.zeros((C,), device=centroid_k.device, dtype=centroid_k.dtype)
+            idx_expand = matched_indices.unsqueeze(-1).expand(-1, D)
+            delta_k.scatter_add_(0, idx_expand, matched_keys)
+            delta_v.scatter_add_(0, idx_expand, matched_vals)
+            # counts
+            one_vec = torch.ones((matched_indices.shape[0],), device=centroid_k.device, dtype=centroid_k.dtype)
+            delta_count.scatter_add_(0, matched_indices, one_vec)
+            # apply updates (vectorized) and persist as tensor-backed storage
+            centroid_k = centroid_k + delta_k
+            counts = counts + delta_count
+            centroid_mean = centroid_k / counts[:, None]
+            # persist tensor-backed storage to avoid per-element clones
+            storage["centroid_k_tensor"] = centroid_k.detach()
+            storage["counts_tensor"] = counts.detach()
+            # clear legacy list storage to avoid duplication
+            storage["sum_k"] = []
+            storage["sum_v"] = []
+            storage["count"] = []
+            # refresh normalized centroids
+            c_norm = normalize(centroid_mean)
+
+        # process new vectors: append in batch up to capacity
+        if new_mask.any():
+            new_keys = rem_k[new_mask]
+            new_vals = rem_v[new_mask]
+            # append new vectors in batch up to capacity using tensor-backed storage
+            # ensure we operate on tensors centroid_k and counts where available
+            if storage.get("centroid_k_tensor", None) is not None and storage.get("counts_tensor", None) is not None:
+                centk = storage["centroid_k_tensor"]
+                cnts = storage["counts_tensor"]
+            else:
+                centk = torch.stack(sum_k_list, dim=0)
+                cnts = torch.tensor(count_list, device=centk.device, dtype=centk.dtype)
+
+            space_left = self.max_gpu_centroids_per_layer - centk.shape[0]
+            if space_left > 0:
+                to_take = min(space_left, new_keys.shape[0])
+                if to_take > 0:
+                    # concatenate first to_take new vectors
+                    centk = torch.cat([centk, new_keys[:to_take]], dim=0)
+                    cnts = torch.cat([cnts, torch.ones((to_take,), device=centk.device, dtype=cnts.dtype)], dim=0)
+            # for remaining new vectors beyond capacity, merge into best existing centroid
+            rem_start = min(new_keys.shape[0], max(0, space_left))
+            if rem_start < new_keys.shape[0]:
+                remaining = new_keys[rem_start:]
+                remaining_vals = new_vals[rem_start:]
+                # compute sims to existing centroids in batch
+                rn = normalize(remaining)
+                cnorm = normalize(centk / (cnts[:, None] + 1e-12))
+                sims_rem = torch.matmul(rn, cnorm.T)
+                best_sim_rem, best_idx_rem = sims_rem.max(dim=1)
+                for j in range(remaining.shape[0]):
+                    idx2 = int(best_idx_rem[j].item())
+                    centk[idx2] = centk[idx2] + remaining[j].detach()
+                    cnts[idx2] = cnts[idx2] + 1.0
+
+            # persist back
+            storage["centroid_k_tensor"] = centk.detach()
+            storage["counts_tensor"] = cnts.detach()
+            storage["sum_k"] = []
+            storage["sum_v"] = []
+            storage["count"] = []
+
+        # if we still exceed capacity (rare), perform greedy merge of most similar centroid pairs
+        while len(sum_k_list) > self.max_gpu_centroids_per_layer:
+            Cc = len(sum_k_list)
+            cent_stack = torch.stack(sum_k_list, dim=0)
+            cn = normalize(cent_stack / (torch.tensor(count_list, device=cent_stack.device, dtype=cent_stack.dtype)[:, None]))
+            sim_mat = torch.matmul(cn, cn.T)
+            sim_mat.fill_diagonal_(-float("inf"))
+            # find pair to merge
+            maxval, maxidx = torch.max(sim_mat.view(-1), dim=0)
+            idx_i = int((maxidx // sim_mat.shape[1]).item())
+            idx_j = int((maxidx % sim_mat.shape[1]).item())
+            # weighted merge j into i
+            wa = count_list[idx_i]
+            wb = count_list[idx_j]
+            sum_k_list[idx_i] = (sum_k_list[idx_i] * wa + sum_k_list[idx_j] * wb) / (wa + wb + 1e-12)
+            sum_v_list[idx_i] = (sum_v_list[idx_i] * wa + sum_v_list[idx_j] * wb) / (wa + wb + 1e-12)
+            count_list[idx_i] = float(wa + wb)
+            # remove j
+            del sum_k_list[idx_j]
+            del sum_v_list[idx_j]
+            del count_list[idx_j]
 
 

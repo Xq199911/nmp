@@ -1,0 +1,20 @@
+{
+  "generations": [
+    {
+      "prompt": "In 100 words, explain the significance of manifold partitioned KV memories.",
+      "generation": "In 100 words, explain the significance of manifold partitioned KV memories. The significance of manifold partitioned KV memories is that they can handle a large number of keys without compromising the performance of the data storage system. They are particularly useful in applications where the number of keys is dynamic and unpredictable. The manifold partitioning technique allows for efficient distribution of keys across multiple nodes, ensuring that no single node"
+    },
+    {
+      "prompt": "Briefly summarize how centroid compression can help long-context transformers.",
+      "generation": "Briefly summarize how centroid compression can help long-context transformers. \n\nCentroid compression is a technique that helps long-context transformers by reducing the dimensionality of the input embeddings. This is achieved by mapping the input embeddings to a lower-dimensional space using a centroid-based method, which reduces the computational cost and memory requirements of the model. By compressing the input embeddings, centroid compression can help"
+    },
+    {
+      "prompt": "Explain online clustering for KV caches and why it's useful.",
+      "generation": "Explain online clustering for KV caches and why it's useful. Online clustering for KV caches is a technique used to group key-value (KV) pairs that are frequently accessed together. This is useful in several ways:\n1. **Improved cache hit ratio**: By clustering related KV pairs together, the cache hit ratio can be improved. When a KV pair is accessed, it's likely that"
+    },
+    {
+      "prompt": "Discuss challenges of position encoding when merging KV tokens.",
+      "generation": "Discuss challenges of position encoding when merging KV tokens. More...\n\n## Macro Definition Documentation\n\n## ◆  kMaxTokenLength\n\nThe maximum length of a token.\n\nThe maximum length of a token is the maximum length of a key-value pair in a merge operation.\n\nDefinition at line 25 of file merge_tokens.h.\n\n## ◆  kMaxTokenLengthPlusOne\n\nThe"
+    }
+  ]
+}

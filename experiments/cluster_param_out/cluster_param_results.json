@@ -1,0 +1,274 @@
+{
+  "params": {
+    "persistence_list": [
+      1.0,
+      0.9,
+      0.7,
+      0.5
+    ],
+    "window_list": [
+      null,
+      1024,
+      4096
+    ],
+    "max_centroids_list": [
+      128,
+      256,
+      512
+    ]
+  },
+  "results": [
+    {
+      "max_centroids": 128,
+      "window_size": null,
+      "persistence_decay": 1.0,
+      "num_centroids": 89,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": null,
+      "persistence_decay": 0.9,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": null,
+      "persistence_decay": 0.7,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": null,
+      "persistence_decay": 0.5,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": 1024,
+      "persistence_decay": 1.0,
+      "num_centroids": 89,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": 1024,
+      "persistence_decay": 0.9,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": 1024,
+      "persistence_decay": 0.7,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": 1024,
+      "persistence_decay": 0.5,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": 4096,
+      "persistence_decay": 1.0,
+      "num_centroids": 89,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": 4096,
+      "persistence_decay": 0.9,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": 4096,
+      "persistence_decay": 0.7,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 128,
+      "window_size": 4096,
+      "persistence_decay": 0.5,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": null,
+      "persistence_decay": 1.0,
+      "num_centroids": 89,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": null,
+      "persistence_decay": 0.9,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": null,
+      "persistence_decay": 0.7,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": null,
+      "persistence_decay": 0.5,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": 1024,
+      "persistence_decay": 1.0,
+      "num_centroids": 89,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": 1024,
+      "persistence_decay": 0.9,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": 1024,
+      "persistence_decay": 0.7,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": 1024,
+      "persistence_decay": 0.5,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": 4096,
+      "persistence_decay": 1.0,
+      "num_centroids": 89,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": 4096,
+      "persistence_decay": 0.9,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": 4096,
+      "persistence_decay": 0.7,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 256,
+      "window_size": 4096,
+      "persistence_decay": 0.5,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": null,
+      "persistence_decay": 1.0,
+      "num_centroids": 89,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": null,
+      "persistence_decay": 0.9,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": null,
+      "persistence_decay": 0.7,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": null,
+      "persistence_decay": 0.5,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": 1024,
+      "persistence_decay": 1.0,
+      "num_centroids": 89,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": 1024,
+      "persistence_decay": 0.9,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": 1024,
+      "persistence_decay": 0.7,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": 1024,
+      "persistence_decay": 0.5,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": 4096,
+      "persistence_decay": 1.0,
+      "num_centroids": 89,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": 4096,
+      "persistence_decay": 0.9,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": 4096,
+      "persistence_decay": 0.7,
+      "num_centroids": 72,
+      "recall": 1.0
+    },
+    {
+      "max_centroids": 512,
+      "window_size": 4096,
+      "persistence_decay": 0.5,
+      "num_centroids": 72,
+      "recall": 1.0
+    }
+  ]
+}
