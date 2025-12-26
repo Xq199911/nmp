@@ -29,9 +29,15 @@ def run_and_save(model_dir: str, out_dir: str, enable_injection: bool, repeat: i
     mgr = MPKVMManager(dim=hidden_size, num_layers=num_layers, cluster_kwargs={"max_centroids": 1024, "sliding_window_size": 16384})
     # configure manager to dump attention arrays to disk for comparability
     try:
-        mgr._attn_out_dir = out_dir
+        if hasattr(mgr, "set_attn_out_dir"):
+            mgr.set_attn_out_dir(out_dir)
+        else:
+            mgr._attn_out_dir = out_dir
     except Exception:
-        pass
+        try:
+            print(f"[MPKVM] failed to configure attn_out_dir at {out_dir}")
+        except Exception:
+            pass
     attach_mpkvm_to_hf_llama(model, mgr, head_mean=True, sample_stride=1, enable_injection=enable_injection)
 
     prompts = [

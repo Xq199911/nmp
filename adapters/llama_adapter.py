@@ -361,6 +361,7 @@ def attach_mpkvm_to_hf_llama(
                                         # prefer num_key_value_heads or num_key_value_groups if available
                                         n_kv_heads = getattr(attn_module, "num_key_value_heads", None) or getattr(attn_module, "num_key_value_groups", None)
                                         handled = False
+                                        H = None
                                         if n_kv_heads is not None and int(n_kv_heads) > 0 and qf.shape[-1] == kf.shape[-1] * int(n_kv_heads):
                                             H = int(n_kv_heads)
                                             handled = True
@@ -370,12 +371,41 @@ def attach_mpkvm_to_hf_llama(
                                                 H = int(qf.shape[-1] // kf.shape[-1])
                                                 handled = True
 
-                                        if handled:
-                                            # split qf's last dim into heads
-                                            Bn, Sq, Dq = qf.shape
-                                            Dh = int(kf.shape[-1])
-                                            # reshape (Bn, Sq, H*Dh) -> (Bn, H, Sq, Dh) -> (Bn*H, Sq, Dh)
-                                            qf = qf.reshape(Bn, Sq, H, Dh).permute(0, 2, 1, 3).reshape(-1, Sq, Dh)
+                                        if handled and H is not None:
+                                            # First try to align batch-like dims by repeating k across head groups if needed
+                                            try:
+                                                # If kff batch axis is smaller by factor H, expand it
+                                                if kf.shape[0] * H == qf.shape[0]:
+                                                    try:
+                                                        kf = kf.repeat_interleave(H, dim=0)
+                                                        if _DEBUG:
+                                                            print(f"[MPKVM][layer {layer_idx}] expanded kf by repeat_interleave, new batch dim {kf.shape[0]}")
+                                                    except Exception:
+                                                        # fallback to repeat
+                                                        kf = kf.repeat(H, 1, 1)
+                                                        if _DEBUG:
+                                                            print(f"[MPKVM][layer {layer_idx}] expanded kf by repeat, new batch dim {kf.shape[0]}")
+                                                # If kf already matches qf batch dim, nothing to do
+                                                if qf.shape[0] == kf.shape[0] and qf.shape[-1] == kf.shape[-1]:
+                                                    # perfectly aligned already
+                                                    pass
+                                                else:
+                                                    # attempt reshaping qf into (Bn, Sq, H, Dh) as previous logic
+                                                    Bn, Sq, Dq = qf.shape
+                                                    Dh = int(kf.shape[-1])
+                                                    try:
+                                                        qf = qf.reshape(Bn, Sq, H, Dh).permute(0, 2, 1, 3).reshape(-1, Sq, Dh)
+                                                    except Exception:
+                                                        # if reshape fails, mark as incompatible
+                                                        qf = None
+                                                        if _DEBUG:
+                                                            print(f"[MPKVM][layer {layer_idx}] failed to reshape qf for GQA handling qf.shape={qf} kf.shape={kf.shape}")
+                                            except Exception:
+                                                qf = None
+                                                if _DEBUG:
+                                                    import traceback
+
+                                                    print(f"[MPKVM][layer {layer_idx}] GQA alignment failed: {traceback.format_exc()}")
                                         else:
                                             # incompatible shapes; skip recording to avoid expensive errors
                                             raise RuntimeError(f"incompatible q/k head dims q={qf.shape} k={kf.shape}")
@@ -472,6 +502,7 @@ def attach_mpkvm_to_hf_llama(
                             if qff.shape[-1] != kff.shape[-1]:
                                 n_kv_heads = getattr(attn_module, "num_key_value_heads", None) or getattr(attn_module, "num_key_value_groups", None)
                                 handled = False
+                                H = None
                                 if n_kv_heads is not None and int(n_kv_heads) > 0 and qff.shape[-1] == kff.shape[-1] * int(n_kv_heads):
                                     H = int(n_kv_heads)
                                     handled = True
@@ -479,10 +510,33 @@ def attach_mpkvm_to_hf_llama(
                                     if kff.shape[-1] > 0 and (qff.shape[-1] % kff.shape[-1]) == 0:
                                         H = int(qff.shape[-1] // kff.shape[-1])
                                         handled = True
-                                if handled:
-                                    Bn, Sq, Dq = qff.shape
-                                    Dh = int(kff.shape[-1])
-                                    qff = qff.reshape(Bn, Sq, H, Dh).permute(0, 2, 1, 3).reshape(-1, Sq, Dh)
+                                if handled and H is not None:
+                                    # Try to align batch-like dims by repeating kff across head groups if necessary
+                                    try:
+                                        if kff.shape[0] * H == qff.shape[0]:
+                                            try:
+                                                kff = kff.repeat_interleave(H, dim=0)
+                                                if _DEBUG:
+                                                    print(f"[MPKVM][layer {layer_idx}] expanded kff by repeat_interleave to match qff batch dim {kff.shape[0]}")
+                                            except Exception:
+                                                kff = kff.repeat(H, 1, 1)
+                                                if _DEBUG:
+                                                    print(f"[MPKVM][layer {layer_idx}] expanded kff by repeat fallback to match qff batch dim {kff.shape[0]}")
+                                        # attempt to reshape qff into separate head dim if needed
+                                        if qff.shape[-1] == kff.shape[-1] * H:
+                                            Bn, Sq, Dq = qff.shape
+                                            Dh = int(kff.shape[-1])
+                                            try:
+                                                qff = qff.reshape(Bn, Sq, H, Dh).permute(0, 2, 1, 3).reshape(-1, Sq, Dh)
+                                            except Exception:
+                                                qff = None
+                                                if _DEBUG:
+                                                    print(f"[MPKVM][layer {layer_idx}] failed to reshape qff for GQA handling; qff.shape={Bn,Sq,Dq} H={H} Dh={Dh}")
+                                    except Exception:
+                                        qff = None
+                                        if _DEBUG:
+                                            import traceback
+                                            print(f"[MPKVM][layer {layer_idx}] GQA alignment failed: {traceback.format_exc()}")
                                 else:
                                     qff = None
                             if qff is not None:
@@ -495,7 +549,31 @@ def attach_mpkvm_to_hf_llama(
                                         print(f"[MPKVM][layer {layer_idx}] forced-proj recorded attention shape={getattr(weights,'shape',None)}")
                                 except Exception:
                                     if _DEBUG:
-                                        print(f"[MPKVM][layer {layer_idx}] forced-proj failed to save attention")
+                                        print(f"[MPKVM][layer {layer_idx}] forced-proj failed to save attention via manager.record_attention, attempting direct save")
+                                    # try direct save to manager._attn_out_dir as a fallback to isolate issue
+                                    try:
+                                        import time
+                                        w_np = weights.detach().cpu().numpy()
+                                        out_base = getattr(manager, "_attn_out_dir", None)
+                                        if out_base:
+                                            out_layer_dir = os.path.join(out_base, f"layer_{layer_idx}")
+                                            os.makedirs(out_layer_dir, exist_ok=True)
+                                            fname = os.path.join(out_layer_dir, f"attn_forced_{int(time.time())}.npy")
+                                            try:
+                                                np.save(fname, w_np)
+                                                if _DEBUG:
+                                                    print(f"[MPKVM][layer {layer_idx}] forced-proj direct-saved attention to {fname}")
+                                            except Exception:
+                                                if _DEBUG:
+                                                    import traceback
+                                                    print(f"[MPKVM][layer {layer_idx}] forced-proj direct save failed: {traceback.format_exc()}")
+                                    except Exception:
+                                        if _DEBUG:
+                                            try:
+                                                import traceback
+                                                print(f"[MPKVM][layer {layer_idx}] forced-proj direct-save fallback failed: {traceback.format_exc()}")
+                                            except Exception:
+                                                pass
                 except Exception:
                     if _DEBUG:
                         try:
@@ -703,6 +781,11 @@ def attach_mpkvm_to_hf_llama(
             pass
 
         setattr(attn_module, "forward", make_wrapped(orig_forward, attn_module, idx))
+        # mark module as wrapped to avoid double-wrapping by other tools/scripts
+        try:
+            setattr(attn_module, "_mpkvm_wrapped", True)
+        except Exception:
+            pass
 
     return model
 

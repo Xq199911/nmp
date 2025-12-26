@@ -13,6 +13,12 @@ def wrap_attention_module(attn_module, layer_idx, out_layer_dir):
     original_forward = getattr(attn_module, "forward", None)
     if original_forward is None:
         return attn_module
+    # if module already wrapped by adapter, skip to avoid double-wrapping
+    try:
+        if getattr(attn_module, "_mpkvm_wrapped", False):
+            return attn_module
+    except Exception:
+        pass
 
     def _to_numpy(t):
         if isinstance(t, torch.Tensor):
@@ -119,6 +125,10 @@ def wrap_attention_module(attn_module, layer_idx, out_layer_dir):
         return outputs
 
     setattr(attn_module, "forward", wrapped)
+    try:
+        setattr(attn_module, "_mpkvm_wrapped", True)
+    except Exception:
+        pass
     return attn_module
 
 
@@ -160,9 +170,15 @@ def attach_and_run(model_dir: str, out_dir: str, enable_injection: bool, repeat:
 
     # configure manager to dump attention arrays to disk for comparability
     try:
-        cpu_manager._attn_out_dir = mode_dir
+        if hasattr(cpu_manager, "set_attn_out_dir"):
+            cpu_manager.set_attn_out_dir(mode_dir)
+        else:
+            cpu_manager._attn_out_dir = mode_dir
     except Exception:
-        pass
+        try:
+            print(f"[MPKVM] failed to configure attn_out_dir at {mode_dir}")
+        except Exception:
+            pass
 
     # attach wrapper per layer to record attention
     for idx, layer in enumerate(getattr(layers_container, "layers")):
@@ -189,6 +205,7 @@ def attach_and_run(model_dir: str, out_dir: str, enable_injection: bool, repeat:
 
     # Minimal verification: force-compute attention for layer_0 via q_proj/k_proj and save to disk
     try:
+        print("[MPKVM][test] starting minimal layer_0 forced attention compute")
         # prepare a single input to compute projections
         sample_prompt = "Verify attention recording"
         try:
